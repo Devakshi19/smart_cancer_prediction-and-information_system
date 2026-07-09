@@ -4,7 +4,7 @@ void main() {
   runApp(MaterialApp(
     home: Material(
       child: Center(
-        child: Text("HEY I'M DEVAKSHI"),
+        child: Text("HEY I'M DEVAKSHI")
       ),
     ),
   ));
