@@ -20,11 +20,16 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cancer Detection App"),
+        title: const Text(
+          'Cancer Detection App',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.indigoAccent,
+        centerTitle: true,
       ),
-
-      // The Drawer goes here
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -32,7 +37,7 @@ class _HomePageState extends State<HomePage> {
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.indigoAccent),
               child: Text(
-                'Menu Options',
+                'Menu Option',
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
             ),
@@ -65,15 +70,12 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-
       body: Center(child: Text('Selected Index: $_selectedIndex')),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.indigoAccent,
         child: const Icon(Icons.call),
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.indigoAccent,
