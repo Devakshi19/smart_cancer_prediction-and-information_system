@@ -34,11 +34,36 @@ class _HomePageState extends State<HomePage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.indigoAccent),
-              child: Text(
-                'Menu Option',
-                style: TextStyle(color: Colors.white, fontSize: 20),
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.indigoAccent,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CircleAvatar(
+                    radius: 30,
+                    backgroundImage: AssetImage("assets/drawer_logo.jpeg"),
+                    backgroundColor: Colors.white,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Cancer Detection App",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Text(
+                    "AI-Based Cancer Detection",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
             ),
             ListTile(
