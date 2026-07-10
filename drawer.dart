@@ -58,7 +58,6 @@ class HomePage extends StatelessWidget {
         ),
       ),
 
-      // -------------------------------
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.indigoAccent,
