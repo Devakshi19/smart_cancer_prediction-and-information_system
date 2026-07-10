@@ -59,9 +59,7 @@ class HomePage extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Log Out'),
-              onTap: () {
-                // Add logout logic
-              },
+              onTap: () {},
             ),
           ],
         ),
