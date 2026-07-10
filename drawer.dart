@@ -16,8 +16,6 @@ class HomePage extends StatelessWidget {
         title: const Text("Cancer Detection App"),
         backgroundColor: Colors.indigoAccent,
       ),
-
-      // --- FINAL INTEGRATED DRAWER ---
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -68,8 +66,6 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-
-      // -------------------------------
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.indigoAccent,
