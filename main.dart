@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'Splashscreen.dart'; // Ensure this file exists
-import 'login.dart';
-import 'About.dart';
-import 'Help.dart';
-import 'Terms&condition.dart'; // Ensure this file exists
-import 'privacy policy.dart';
+
+import 'screens.dart';
+import 'widgets.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,6 +40,14 @@ class _HomePageState extends State<HomePage> {
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.teal,
+      ),
+      body: ListView(
+        children: [
+          SkinCancerCard(),
+          LungCancerCard(),
+          UterineCancerCard(),
+          BreastCancerCard()
+        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -151,7 +156,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: Center(child: Text('Selected Index: $_selectedIndex')),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.indigoAccent,
