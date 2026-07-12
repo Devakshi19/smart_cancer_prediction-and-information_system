@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
+import 'Splashscreen.dart';
 
 void main() {
   runApp(
-    const MaterialApp(debugShowCheckedModeBanner: false, home: HomePage()),
+    const MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen()),
   );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: SplashScreen(), // Open Splash Screen first
+    );
+  }
 }
 
 class HomePage extends StatefulWidget {
