@@ -7,7 +7,11 @@ class TermsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Terms & Conditions"),
+        title: const Text("TERMS & CONDITION",
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold
+            )),
+        backgroundColor: Colors.indigoAccent,
+        foregroundColor: Colors.white,
       ),
       body: const Center(
         child: Text(
