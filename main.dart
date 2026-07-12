@@ -37,11 +37,11 @@ class _HomePageState extends State<HomePage> {
           'Cancer Detection App',
           style: TextStyle(
             fontSize: 22,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: Colors.indigoAccent,
-        centerTitle: true,
       ),
       drawer: Drawer(
         child: ListView(
