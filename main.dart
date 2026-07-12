@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'Splashscreen.dart';
+import 'Splashscreen.dart'; // Ensure this file exists
+import 'login.dart';
+import 'About.dart';
+import 'Help.dart';
+import 'Terms&condition.dart'; // Ensure this file exists
 
 void main() {
-  runApp(
-    const MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen()),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -14,7 +16,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(), // Open Splash Screen first
+      title: 'Cancer Detection App',
+      home: SplashScreen(), // Starts with Splash
     );
   }
 }
@@ -35,22 +38,17 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text(
           'Cancer Detection App',
-          style: TextStyle(
-            fontSize: 22,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.indigoAccent,
+        foregroundColor: Colors.white,
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Colors.indigoAccent,
-              ),
+              decoration: const BoxDecoration(color: Colors.indigoAccent),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,10 +69,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const Text(
                     "AI-Based Cancer Detection",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                 ],
               ),
@@ -87,23 +82,56 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text('About'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutPage(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.help),
               title: const Text('Help & Feedback'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HelpPage(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.description),
               title: const Text('Terms & Conditions'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TermsPage(),
+                  ),
+                );
+              },
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Log Out'),
-              onTap: () {},
+              onTap: () {
+                // Navigate back to Login Screen and clear navigation history
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
             ),
           ],
         ),
@@ -112,7 +140,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.indigoAccent,
-        child: const Icon(Icons.call),
+        child: const Icon(Icons.call, color: Colors.white),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
