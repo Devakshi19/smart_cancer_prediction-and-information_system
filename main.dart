@@ -4,6 +4,7 @@ import 'login.dart';
 import 'About.dart';
 import 'Help.dart';
 import 'Terms&condition.dart'; // Ensure this file exists
+import 'privacy policy.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,8 +41,8 @@ class _HomePageState extends State<HomePage> {
           'Cancer Detection App',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.indigoAccent,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.teal,
       ),
       drawer: Drawer(
         child: ListView(
@@ -89,6 +90,20 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const AboutPage(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.lock_outline_sharp),
+              title: const Text('Privacy Policy'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PrivacyPage(),
                   ),
                 );
               },
