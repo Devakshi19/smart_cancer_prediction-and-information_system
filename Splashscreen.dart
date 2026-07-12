@@ -29,67 +29,99 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Container(
         width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
-              Color(0xffEAF6FF),
-              Colors.white,
+              Color.fromARGB(255, 0, 174, 239),
+              Color(0xFF5C6CFD),
+              Color(0xFFB337D6),
             ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Logo
-            Container(
-              height: 220,
-              width: 220,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x220099FF),
-                    blurRadius: 25,
-                    spreadRadius: 5,
-                  )
-                ],
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Logo
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.4),
+                                blurRadius: 40,
+                                spreadRadius: 10,
+                              ),
+                            ],
+                          ),
+                          child: Image.asset(
+                            "assets/splash_screen.jpeg",
+                            height: 180,
+                          ),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        const Text(
+                          "CANCER DETECTION",
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 2,
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        const Text(
+                          "Early Detection, Better Tomorrow",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Consolas',
+                            fontSize: 16,
+                          ),
+                        ),
+
+                        const SizedBox(height: 60),
+
+                        const SizedBox(
+                          width: 45,
+                          height: 45,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 3,
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        const Text(
+                          "Initializing AI Model...",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              child: Image.asset("assets/splash_screen.jpeg"),
-            ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              "CANCER DETECTION",
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: Color(0xff1A2C5B),
-                letterSpacing: 2,
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            const Text(
-              "Early Detection, Better Tomorrow",
-              style: TextStyle(
-                color: Colors.black54,
-                fontFamily: 'Consolas',
-                fontSize: 16,
-              ),
-            ),
-
-            const SizedBox(height: 40),
-
-            const CircularProgressIndicator(
-              color: Color(0xff5A5BFF),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
