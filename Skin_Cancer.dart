@@ -19,12 +19,13 @@ class SkinCancerCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             gradient: const LinearGradient(
-              colors: [
-                Color(0xFF00B09B),
-                Color(0xFF96C93D),
-              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 177, 148, 222),
+                Color.fromARGB(255, 156, 153, 227),
+                Color.fromARGB(255, 158, 188, 252), // Pastel Blue
+              ],
             ),
             boxShadow: const [
               BoxShadow(
