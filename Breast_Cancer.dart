@@ -17,20 +17,21 @@ class BreastCancerCard extends StatelessWidget {
         child: Container(
           height: 180,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(28),
             gradient: const LinearGradient(
-              colors: [
-                Color(0xFF00B09B),
-                Color(0xFF96C93D),
-              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
+              colors: [
+                Color.fromARGB(255, 177, 148, 222),
+                Color.fromARGB(255, 156, 153, 227),
+                Color.fromARGB(255, 158, 188, 252),
+              ],
             ),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10,
-                offset: Offset(0, 5),
+                color: Colors.black12,
+                blurRadius: 12,
+                offset: Offset(0, 6),
               ),
             ],
           ),
