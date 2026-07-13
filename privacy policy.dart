@@ -9,7 +9,7 @@ class PrivacyPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("PRIVACY POLICY",
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.indigoAccent,
+        backgroundColor: Color.fromARGB(255, 156, 153, 227),
         foregroundColor: Colors.white,
       ),
       body: const Center(
