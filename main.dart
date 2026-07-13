@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+
+import 'screens.dart';
+import 'widgets.dart';
 void main() {
   runApp(
-    const MaterialApp(debugShowCheckedModeBanner: false, home: HomePage()),
+    const MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen()),
   );
 }
 
@@ -28,7 +31,15 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         backgroundColor: Colors.indigoAccent,
-        centerTitle: true,
+
+      ),
+      body: ListView(
+        children: [
+          SkinCancerCard(),
+          LungCancerCard(),
+          UterineCancerCard(),
+          BreastCancerCard(),
+        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -95,7 +106,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: Center(child: Text('Selected Index: $_selectedIndex')),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.indigoAccent,
