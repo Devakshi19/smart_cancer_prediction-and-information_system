@@ -4,20 +4,9 @@ import 'screens.dart';
 import 'widgets.dart';
 
 void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Cancer Detection App',
-      home: SplashScreen(), // Starts with Splash
-    );
-  }
+  runApp(
+    const MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen()),
+  );
 }
 
 class HomePage extends StatefulWidget {
@@ -35,18 +24,21 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Cancer Detection App',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          'CANCER DETECTION APP',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.teal,
+        backgroundColor: Color.fromARGB(255, 156, 153, 227),
+        foregroundColor: Colors.white,
       ),
       body: ListView(
         children: [
           SkinCancerCard(),
           LungCancerCard(),
           UterineCancerCard(),
-          BreastCancerCard()
+          BreastCancerCard(),
         ],
       ),
       drawer: Drawer(
@@ -54,7 +46,9 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(color: Colors.indigoAccent),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 156, 153, 227),
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +69,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const Text(
                     "AI-Based Cancer Detection",
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
@@ -95,20 +92,6 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const AboutPage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock_outline_sharp),
-              title: const Text('Privacy Policy'),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const PrivacyPage(),
                   ),
                 );
               },
@@ -136,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const TermsPage(),
+                    builder: (context) => const TermsConditionsPage(),
                   ),
                 );
               },
@@ -145,25 +128,14 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Log Out'),
-              onTap: () {
-                // Navigate back to Login Screen and clear navigation history
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
-              },
+              onTap: () {},
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Colors.indigoAccent,
-        child: const Icon(Icons.call, color: Colors.white),
-      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.indigoAccent,
+        selectedItemColor: Color.fromARGB(255, 156, 153, 227),
         unselectedItemColor: Colors.grey,
         onTap: (int index) {
           setState(() {
@@ -177,6 +149,9 @@ class _HomePageState extends State<HomePage> {
             label: "CONTACT",
           ),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: "SEARCH"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "HISTORY"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.chat_bubble_outline_sharp), label: "HELP"),
         ],
       ),
     );
