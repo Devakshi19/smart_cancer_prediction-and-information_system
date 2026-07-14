@@ -215,35 +215,48 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed, // Needed for 5 items
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        elevation: 12,
         selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,
-
+        selectedFontSize: 13,
+        unselectedFontSize: 11,
+        selectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w500,
+        ),
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
           });
         },
-
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined, size: 28),
+            activeIcon: Icon(Icons.home, size: 30),
             label: "HOME",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.contact_page_rounded),
+            icon: Icon(Icons.perm_contact_calendar_outlined, size: 28),
+            activeIcon: Icon(Icons.perm_contact_calendar, size: 30),
             label: "CONTACT",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.manage_search_outlined, size: 28),
+            activeIcon: Icon(Icons.manage_search, size: 30),
             label: "SEARCH",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.history),
+            icon: Icon(Icons.history_outlined, size: 28),
+            activeIcon: Icon(Icons.history, size: 30),
             label: "HISTORY",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline_sharp),
+            icon: Icon(Icons.support_agent_outlined, size: 28),
+            activeIcon: Icon(Icons.support_agent, size: 30),
             label: "HELP",
           ),
         ],
