@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/screens/signup.dart';
 
 import 'screens.dart';
 import 'widgets.dart';
@@ -23,15 +24,53 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFF9A95E8),
         title: const Text(
-          'CANCER DETECTION APP',
+          "CANCER DETECTION APP",
           style: TextStyle(
-            fontSize: 22,
+            color: Colors.white,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Color.fromARGB(255, 156, 153, 227),
-        foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginPage(),
+                ),
+              );
+            },
+            child: const Text(
+              "LOGIN",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SignupPage(),
+                ),
+              );
+            },
+            child: const Text(
+              "SIGN UP",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+        ],
       ),
       body: ListView(
         children: [
@@ -128,30 +167,85 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Log Out'),
-              onTap: () {},
+              onTap: () async {
+                bool? logout = await showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("Log Out"),
+                    content: const Text(
+                      "Are you sure you want to log out?",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, false);
+                        },
+                        child: const Text("Cancel"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context, true);
+                        },
+                        child: const Text("Log Out"),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (logout == true) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginPage(), // or HomePage()
+                    ),
+                    (route) => false,
+                  );
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("You have been logged out successfully."),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
             ),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        selectedItemColor: Color.fromARGB(255, 156, 153, 227),
+        type: BottomNavigationBarType.fixed, // Needed for 5 items
+        selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,
-        onTap: (int index) {
+
+        onTap: (index) {
           setState(() {
             _selectedIndex = index;
           });
         },
+
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "HOME"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "HOME",
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.contact_page_rounded),
             label: "CONTACT",
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "SEARCH"),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: "HISTORY"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble_outline_sharp), label: "HELP"),
+            icon: Icon(Icons.search),
+            label: "SEARCH",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: "HISTORY",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline_sharp),
+            label: "HELP",
+          ),
         ],
       ),
     );
