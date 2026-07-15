@@ -10,28 +10,44 @@ class BreastCancerCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () {
-          // Navigate to Lung Cancer Page
-          // Navigator.push(context,
-          // MaterialPageRoute(builder: (context) => LungCancerPage()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Scaffold(
+                // <- NO NEW FILE NEEDED
+                appBar: AppBar(
+                  title: const Text("Breast Cancer Details"),
+                  backgroundColor: Color.fromARGB(255, 156, 153, 227),
+                  foregroundColor: Colors.white,
+                ),
+                body: const Center(
+                  child: Text(
+                    "Welcome to Breast Cancer Page", // <- your "welcome to page"
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+          );
         },
         child: Container(
           height: 180,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(30),
             gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
               colors: [
                 Color.fromARGB(255, 177, 148, 222),
                 Color.fromARGB(255, 156, 153, 227),
                 Color.fromARGB(255, 158, 188, 252),
               ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
-                color: Colors.black12,
-                blurRadius: 12,
-                offset: Offset(0, 6),
+                color: Colors.black26,
+                blurRadius: 10,
+                offset: Offset(0, 5),
               ),
             ],
           ),
@@ -43,7 +59,7 @@ class BreastCancerCard extends StatelessWidget {
                 child: Icon(
                   Icons.air,
                   size: 120,
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                 ),
               ),
               Padding(
@@ -93,7 +109,7 @@ class BreastCancerCard extends StatelessWidget {
                           child: const Icon(
                             Icons.arrow_forward_ios,
                             size: 18,
-                            color: Colors.green,
+                            color: Color(0xFF9A95E8),
                           ),
                         ),
                       ],
