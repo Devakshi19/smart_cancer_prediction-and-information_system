@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:project/screens/signup.dart';
 
 import 'screens.dart';
 import 'widgets.dart';
@@ -119,7 +118,16 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text('Profile'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePage(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.info),
@@ -229,9 +237,37 @@ class _HomePageState extends State<HomePage> {
           fontWeight: FontWeight.w500,
         ),
         onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
+          if (index == 0) {
+            setState(() {
+              _selectedIndex = 0;
+            });
+          } else if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ContactPage(),
+              ),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SearchPage(),
+              ),
+            );
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HistoryPage(),
+              ),
+            );
+          } else if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Help_Page()),
+            );
+          }
         },
         items: const [
           BottomNavigationBarItem(
