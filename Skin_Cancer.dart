@@ -10,6 +10,26 @@ class SkinCancerCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Scaffold(
+                // <- NO NEW FILE NEEDED
+                appBar: AppBar(
+                  title: const Text("Skin Cancer Details"),
+                  backgroundColor: Color.fromARGB(255, 156, 153, 227),
+                  foregroundColor: Colors.white,
+                ),
+                body: const Center(
+                  child: Text(
+                    "Welcome to Skin Cancer Page", // <- your "welcome to page"
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+          );
+
           // Navigate to Lung Cancer Page
           // Navigator.push(context,
           // MaterialPageRoute(builder: (context) => LungCancerPage()));
@@ -19,13 +39,13 @@ class SkinCancerCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
               colors: [
                 Color.fromARGB(255, 177, 148, 222),
                 Color.fromARGB(255, 156, 153, 227),
-                Color.fromARGB(255, 158, 188, 252), // Pastel Blue
+                Color.fromARGB(255, 158, 188, 252),
               ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
             boxShadow: const [
               BoxShadow(
@@ -43,7 +63,7 @@ class SkinCancerCard extends StatelessWidget {
                 child: Icon(
                   Icons.air,
                   size: 120,
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                 ),
               ),
               Padding(
@@ -93,7 +113,7 @@ class SkinCancerCard extends StatelessWidget {
                           child: const Icon(
                             Icons.arrow_forward_ios,
                             size: 18,
-                            color: Colors.green,
+                            color: Color(0xFF9A95E8),
                           ),
                         ),
                       ],
