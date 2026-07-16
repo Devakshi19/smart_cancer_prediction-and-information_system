@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/main.dart';
 import 'signup.dart';
 
 class LoginPage extends StatelessWidget {
@@ -52,6 +53,14 @@ class LoginPage extends StatelessWidget {
                   backgroundColor: const Color(0xFF9A95E8),
                 ),
                 onPressed: () {
+                  Navigator.pop(context); // Close the drawer
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(),
+                    ),
+                  );
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Login Successful")),
                   );
