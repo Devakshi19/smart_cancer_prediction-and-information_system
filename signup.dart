@@ -91,7 +91,12 @@ class SignupPage extends StatelessWidget {
                   const Text("Already have an account? "),
                   TextButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPage(),
+                        ),
+                      );
                     },
                     child: const Text("Login"),
                   ),
