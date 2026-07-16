@@ -265,7 +265,7 @@ class _HomePageState extends State<HomePage> {
           } else if (index == 4) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const Help_Page()),
+              MaterialPageRoute(builder: (context) => const AIChatbotPage()),
             );
           }
         },
@@ -293,7 +293,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.support_agent_outlined, size: 28),
             activeIcon: Icon(Icons.support_agent, size: 30),
-            label: "HELP",
+            label: "AI CHATBOAT",
           ),
         ],
       ),
