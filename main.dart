@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'screens.dart';
 import 'widgets.dart';
 
@@ -202,6 +201,7 @@ class _HomePageState extends State<HomePage> {
 
                 if (logout == true) {
                   Navigator.pushAndRemoveUntil(
+                    // ignore: use_build_context_synchronously
                     context,
                     MaterialPageRoute(
                       builder: (context) => const LoginPage(), // or HomePage()
@@ -209,6 +209,7 @@ class _HomePageState extends State<HomePage> {
                     (route) => false,
                   );
 
+                  // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("You have been logged out successfully."),
