@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:project/screens/editprofile.dart';
+import 'editprofile.dart';
+import 'user_session.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -9,13 +10,32 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String name = "Devakshi Panchal";
-  String email = "devakshi@gmail.com";
-  String age = "21 Years";
+  String name = "Loading...";
+  String email = "Loading...";
+  String age = "";
   String gender = "Female";
-  String phone = "+91 XXXXX XXXXX";
-  String weight = "50 kg";
-  String height = "165 cm";
+  String phone = "";
+  String weight = "";
+  String height = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  // Load user details from UserSession
+  Future<void> _loadProfileData() async {
+    final userData = await UserSession.getUser();
+    setState(() {
+      name = userData['name']!;
+      email = userData['email']!;
+      phone = userData['phone']!;
+      age = userData['age']!;
+      weight = userData['weight']!;
+      height = userData['height']!;
+    });
+  }
 
   Widget buildTile(IconData icon, String title, String value) {
     return Card(
@@ -32,12 +52,13 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("PROFILE",
+        title: const Text(
+          "PROFILE",
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-          ),),
-
+          ),
+        ),
         backgroundColor: const Color.fromARGB(255, 156, 153, 227),
         foregroundColor: Colors.white,
       ),
@@ -93,14 +114,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 );
 
                 if (result != null) {
-                  setState(() {
-                    name = result["name"];
-                    email = result["email"];
-                    phone = result["phone"];
-                    age = result["age"];
-                    weight = result["weight"];
-                    height = result["height"];
-                  });
+                  // Save edited info to UserSession
+                  await UserSession.saveUser(
+                    name: result["name"],
+                    email: result["email"],
+                    phone: result["phone"],
+                    age: result["age"],
+                    weight: result["weight"],
+                    height: result["height"],
+                  );
+
+                  // Update UI
+                  _loadProfileData();
                 }
               },
             ),
