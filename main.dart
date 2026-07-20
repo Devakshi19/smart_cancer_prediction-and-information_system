@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/screens/user_session.dart';
 import 'screens.dart';
 import 'widgets.dart';
 
@@ -17,6 +18,23 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  String currentUserName = "Cancer Detection App";
+  String currentUserEmail = "AI-Based Cancer Detection";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDrawerUserData();
+  }
+
+  // Fetch logged-in user data for the Navigation Drawer
+  Future<void> _loadDrawerUserData() async {
+    final userData = await UserSession.getUser();
+    setState(() {
+      currentUserName = userData['name']!;
+      currentUserEmail = userData['email']!;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,20 +114,24 @@ class _HomePageState extends State<HomePage> {
                     backgroundColor: Colors.white,
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    "Cancer Detection App",
-                    style: TextStyle(
+                  Text(
+                    currentUserName,
+                    style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const Text(
-                    "AI-Based Cancer Detection",
-                    style: TextStyle(
+                  Text(
+                    currentUserEmail,
+                    style: const TextStyle(
                       color: Colors.white70,
-                      fontSize: 14,
+                      fontSize: 13,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -117,23 +139,23 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text('Profile'),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
-
-                Navigator.push(
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const ProfilePage(),
                   ),
                 );
+                // Refresh drawer header when returning from Profile page
+                _loadDrawerUserData();
               },
             ),
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text('About'),
               onTap: () {
-                Navigator.pop(context); // Close the drawer
-
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -146,8 +168,7 @@ class _HomePageState extends State<HomePage> {
               leading: const Icon(Icons.help),
               title: const Text('Help & Feedback'),
               onTap: () {
-                Navigator.pop(context); // Close the drawer
-
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -160,8 +181,7 @@ class _HomePageState extends State<HomePage> {
               leading: const Icon(Icons.description),
               title: const Text('Terms & Conditions'),
               onTap: () {
-                Navigator.pop(context); // Close the drawer
-
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -200,16 +220,18 @@ class _HomePageState extends State<HomePage> {
                 );
 
                 if (logout == true) {
+                  // Clear user session
+                  await UserSession.logout();
+
+                  if (!mounted) return;
                   Navigator.pushAndRemoveUntil(
-                    // ignore: use_build_context_synchronously
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const LoginPage(), // or HomePage()
+                      builder: (context) => const LoginPage(),
                     ),
                     (route) => false,
                   );
 
-                  // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("You have been logged out successfully."),
