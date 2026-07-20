@@ -65,31 +65,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
         backgroundColor: const Color.fromARGB(255, 156, 153, 227),
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            buildField("Name", nameController),
-            buildField("Email", emailController),
-            buildField("Phone", phoneController),
-            buildField("Age", ageController),
-            buildField("Weight", weightController),
-            buildField("Height", heightController),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  "name": nameController.text,
-                  "email": emailController.text,
-                  "phone": phoneController.text,
-                  "age": ageController.text,
-                  "weight": weightController.text,
-                  "height": heightController.text,
-                });
-              },
-              child: const Text("Save"),
-            )
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              buildField("Name", nameController),
+              buildField("Email", emailController),
+              buildField("Phone", phoneController),
+              buildField("Age", ageController),
+              buildField("Weight", weightController),
+              buildField("Height", heightController),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context, {
+                    "name": nameController.text,
+                    "email": emailController.text,
+                    "phone": phoneController.text,
+                    "age": ageController.text,
+                    "weight": weightController.text,
+                    "height": heightController.text,
+                  });
+                },
+                child: const Text("Save"),
+              )
+            ],
+          ),
         ),
       ),
     );
