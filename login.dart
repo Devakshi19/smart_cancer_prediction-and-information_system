@@ -1,10 +1,9 @@
-// lib/login.dart
-
 import 'package:flutter/material.dart';
 import 'package:project/api_service.dart';
+import 'package:project/main.dart';
 import 'signup.dart';
-import 'package:project/screens/api_service.dart'; // Import API Service
-import 'package:project/main.dart'; // Assuming HomePage is defined in main.dart or exported from screens.dart
+import 'package:project/screens/api_service.dart';
+import 'user_session.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,17 +13,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // Define controllers and loading state within the StatefulWidget State
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  // Function to handle login logic
   void _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    // 1. Basic Validation
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Email and Password required")),
@@ -32,39 +28,37 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // 2. Start Loading
     setState(() {
       _isLoading = true;
     });
 
-    // 3. Call API Service
     final result = await ApiService.login(email, password);
 
-    // 4. Stop Loading (if widget is still mounted)
     if (!mounted) return;
     setState(() {
       _isLoading = false;
     });
 
-    // 5. Handle Result
     if (result['success'] == true) {
+      final userData = result['user'];
+
+      // Save user session locally
+      await UserSession.saveUser(
+        name: userData['username'] ?? 'User',
+        email: userData['email'] ?? email,
+      );
+
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['message'] ?? "Login Successful")),
       );
 
-      // Handle successful login data (optional)
-      final userData = result['user'];
-      print("Loged in User: ${userData['username']}");
-      // TODO: Save userData (e.g., using Shared Preferences) for persistent login
-
-      // Navigate to HomePage and clear navigation stack
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const HomePage()),
         (route) => false,
       );
     } else {
-      // Show error message from PHP
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['message'] ?? "Login Failed")),
       );
@@ -73,7 +67,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    // Clean up controllers
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -81,7 +74,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Your EXACT layout remains here, just updating logic
     return Scaffold(
       appBar: AppBar(
         title: const Text("Login"),
@@ -100,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 20),
             TextField(
-              controller: _emailController, // Using state variable
+              controller: _emailController,
               decoration: const InputDecoration(
                 labelText: "Email",
                 border: OutlineInputBorder(),
@@ -110,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 15),
             TextField(
-              controller: _passwordController, // Using state variable
+              controller: _passwordController,
               obscureText: true,
               decoration: const InputDecoration(
                 labelText: "Password",
@@ -125,7 +117,6 @@ class _LoginPageState extends State<LoginPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF9A95E8),
                 ),
-                // Conditionally show loading or text, use _handleLogin
                 onPressed: _isLoading ? null : _handleLogin,
                 child: _isLoading
                     ? const SizedBox(
