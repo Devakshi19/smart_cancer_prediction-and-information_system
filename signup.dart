@@ -1,9 +1,8 @@
-// lib/signup.dart
-
 import 'package:flutter/material.dart';
 import 'package:project/api_service.dart';
 import 'login.dart';
-import 'api_service.dart'; // Import the API service
+import 'api_service.dart';
+import 'user_session.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -13,19 +12,16 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  // Define controllers and loading state within the StatefulWidget State
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLoading = false; // To show loading indicator on button
+  bool _isLoading = false;
 
-  // Function to handle signup logic
   void _handleSignup() async {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    // 1. Basic Validation (Optional but recommended)
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fill all fields")),
@@ -33,33 +29,32 @@ class _SignupPageState extends State<SignupPage> {
       return;
     }
 
-    // 2. Start Loading
     setState(() {
       _isLoading = true;
     });
 
-    // 3. Call API Service
     final result = await ApiService.signup(name, email, password);
 
-    // 4. Stop Loading (if widget is still mounted)
     if (!mounted) return;
     setState(() {
       _isLoading = false;
     });
 
-    // 5. Handle Result
     if (result['success'] == true) {
+      // Save signed-up user credentials
+      await UserSession.saveUser(name: name, email: email);
+
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(result['message'] ?? "Account Created Successfully")),
       );
-      // Navigate to Login Page after success
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const LoginPage()),
       );
     } else {
-      // Show error message from PHP
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['message'] ?? "Registration Failed")),
       );
@@ -68,7 +63,6 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   void dispose() {
-    // Clean up controllers when the widget is disposed
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -77,7 +71,6 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Your EXACT layout remains here, just updating logic
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -99,7 +92,7 @@ class _SignupPageState extends State<SignupPage> {
               ),
               const SizedBox(height: 20),
               TextField(
-                controller: _nameController, // Using state variable
+                controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: "Full Name",
                   border: OutlineInputBorder(),
@@ -108,17 +101,17 @@ class _SignupPageState extends State<SignupPage> {
               ),
               const SizedBox(height: 15),
               TextField(
-                controller: _emailController, // Using state variable
+                controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: "Email",
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.email),
                 ),
-                keyboardType: TextInputType.emailAddress, // Add keyboard type
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 15),
               TextField(
-                controller: _passwordController, // Using state variable
+                controller: _passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: "Password",
@@ -133,7 +126,6 @@ class _SignupPageState extends State<SignupPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF9A95E8),
                   ),
-                  // Conditionally show loading or text, use _handleSignup
                   onPressed: _isLoading ? null : _handleSignup,
                   child: _isLoading
                       ? const SizedBox(
