@@ -16,14 +16,62 @@ class SkinCancerCard extends StatelessWidget {
               builder: (context) => Scaffold(
                 // <- NO NEW FILE NEEDED
                 appBar: AppBar(
-                  title: const Text("Skin Cancer Details"),
+                  title: const Text("SKIN CANCER DETAILS",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),),
                   backgroundColor: Color.fromARGB(255, 156, 153, 227),
                   foregroundColor: Colors.white,
                 ),
-                body: const Center(
-                  child: Text(
-                    "Welcome to Skin Cancer Page", // <- your "welcome to page"
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                body: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Welcome to Skin Cancer Page",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Find experienced dermatologists and skin cancer specialists near you.",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+                      const Text(
+                        "Recommended Doctors",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      doctorCard(
+                        "Dr. Priya Sharma",
+                        "Dermatologist",
+                        "Apollo Hospital",
+                        "+91 9876543210",
+                      ),
+                      doctorCard(
+                        "Dr. Rahul Patel",
+                        "Skin Cancer Specialist",
+                        "Sterling Hospital",
+                        "+91 9123456789",
+                      ),
+                      doctorCard(
+                        "Dr. Neha Mehta",
+                        "Oncodermatologist",
+                        "Civil Hospital",
+                        "+91 9988776655",
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -127,4 +175,60 @@ class SkinCancerCard extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget doctorCard(
+  String name,
+  String specialization,
+  String hospital,
+  String phone,
+) {
+  return Card(
+    margin: const EdgeInsets.only(bottom: 15),
+    elevation: 5,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(15),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            radius: 30,
+            child: Icon(Icons.person, size: 35),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(specialization),
+                Text(hospital),
+                const SizedBox(height: 5),
+                Text(
+                  phone,
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {},
+            child: const Text("View"),
+          )
+        ],
+      ),
+    ),
+  );
 }
