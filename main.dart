@@ -1,22 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:project/screens/settings_page.dart';
 import 'package:project/screens/user_session.dart';
 import 'screens.dart';
 import 'widgets.dart';
 
-// --- APP STATE FOR THEME & TRANSLATIONS ---
+// --- THEME MANAGER CLASS ---
+class ThemeManager extends ChangeNotifier {
+  static ThemeManager? _instance;
+  ThemeManager._();
+
+  static ThemeManager get instance {
+    _instance ??= ThemeManager._();
+    return _instance!;
+  }
+
+  ThemeMode _themeMode = ThemeMode.light;
+  ThemeMode get themeMode => _themeMode;
+
+  // Load saved theme when app starts
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool isDark = prefs.getBool('isDarkMode') ?? false;
+    _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+    notifyListeners();
+  }
+
+  // Toggle and save theme
+  Future<void> toggleTheme(bool isDark) async {
+    _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', isDark);
+    notifyListeners();
+  }
+}
+
+// --- APP STATE FOR TRANSLATIONS & THEME ACCESS ---
 class AppState {
-  static final ValueNotifier<ThemeMode> themeNotifier =
-      ValueNotifier(ThemeMode.light);
   static final ValueNotifier<String> languageNotifier =
       ValueNotifier('English');
 
   static Future<void> init() async {
-    // Load preferences logic handled inside SettingsPage/UserSession
+    // Load theme from SharedPreferences
+    await ThemeManager.instance.loadTheme();
   }
 
   static void toggleTheme(bool isDark) {
-    themeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;
+    ThemeManager.instance.toggleTheme(isDark);
   }
 
   static void setLanguage(String lang) {
@@ -94,15 +124,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: AppState.themeNotifier,
-      builder: (context, currentTheme, _) {
+    return ListenableBuilder(
+      listenable: ThemeManager.instance,
+      builder: (context, _) {
         return ValueListenableBuilder<String>(
           valueListenable: AppState.languageNotifier,
           builder: (context, __, ___) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
-              themeMode: currentTheme,
+              themeMode: ThemeManager.instance.themeMode,
               theme: ThemeData(
                 brightness: Brightness.light,
                 primaryColor: const Color(0xFF9A95E8),
