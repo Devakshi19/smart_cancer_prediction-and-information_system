@@ -24,7 +24,6 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadProfileData();
   }
 
-  // Load user details from UserSession
   Future<void> _loadProfileData() async {
     final userData = await UserSession.getUser();
     setState(() {
@@ -114,7 +113,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 );
 
                 if (result != null) {
-                  // Save edited info to UserSession
                   await UserSession.saveUser(
                     name: result["name"],
                     email: result["email"],
@@ -123,8 +121,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     weight: result["weight"],
                     height: result["height"],
                   );
-
-                  // Update UI
                   _loadProfileData();
                 }
               },
