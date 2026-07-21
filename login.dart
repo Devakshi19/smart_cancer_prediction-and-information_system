@@ -41,8 +41,6 @@ class _LoginPageState extends State<LoginPage> {
 
     if (result['success'] == true) {
       final userData = result['user'];
-
-      // Save user session locally
       await UserSession.saveUser(
         name: userData['username'] ?? 'User',
         email: userData['email'] ?? email,
