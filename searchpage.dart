@@ -12,25 +12,27 @@ class _SearchPageState extends State<SearchPage> {
 
   Map<String, String> cancerInfo = {
     "Breast Cancer":
-    "Breast cancer begins in breast tissue. Early detection using mammograms increases the chance of successful treatment.",
-
+        "Breast cancer begins in breast tissue. Early detection using mammograms increases the chance of successful treatment.",
     "Skin Cancer":
-    "Skin cancer develops because of abnormal skin cell growth. Protect yourself from UV rays.",
-
+        "Skin cancer develops because of abnormal skin cell growth. Protect yourself from UV rays.",
     "Lung Cancer":
-    "Lung cancer usually affects smokers but can also occur in non-smokers.",
-
+        "Lung cancer usually affects smokers but can also occur in non-smokers.",
     "Symptoms":
-    "Common symptoms include fatigue, unexplained weight loss, persistent cough and unusual lumps.",
-
+        "Common symptoms include fatigue, unexplained weight loss, persistent cough and unusual lumps.",
     "Treatment":
-    "Treatment includes surgery, chemotherapy, radiation therapy and immunotherapy."
+        "Treatment includes surgery, chemotherapy, radiation therapy and immunotherapy."
   };
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("SEARCH"),
+        title: const Text(
+          "SEARCH",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: const Color.fromARGB(255, 156, 153, 227),
         foregroundColor: Colors.white,
       ),
@@ -39,7 +41,6 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           children: [
             TextField(
-
               onChanged: (value) {
                 setState(() {
                   searchText = value;
@@ -54,8 +55,6 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
             const SizedBox(height: 25),
-
-
             Text(
               "Popular Searches",
               style: TextStyle(
@@ -63,12 +62,10 @@ class _SearchPageState extends State<SearchPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             Wrap(
               spacing: 10,
               runSpacing: 10,
               children: [
-
                 ActionChip(
                   label: const Text("Breast Cancer"),
                   onPressed: () {
@@ -77,7 +74,6 @@ class _SearchPageState extends State<SearchPage> {
                     });
                   },
                 ),
-
                 ActionChip(
                   label: const Text("Skin Cancer"),
                   onPressed: () {
@@ -86,7 +82,6 @@ class _SearchPageState extends State<SearchPage> {
                     });
                   },
                 ),
-
                 ActionChip(
                   label: const Text("Lung Cancer"),
                   onPressed: () {
@@ -95,7 +90,6 @@ class _SearchPageState extends State<SearchPage> {
                     });
                   },
                 ),
-
                 ActionChip(
                   label: const Text("Symptoms"),
                   onPressed: () {
@@ -104,7 +98,6 @@ class _SearchPageState extends State<SearchPage> {
                     });
                   },
                 ),
-
                 ActionChip(
                   label: const Text("Treatment"),
                   onPressed: () {
@@ -113,7 +106,6 @@ class _SearchPageState extends State<SearchPage> {
                     });
                   },
                 ),
-
               ],
             ),
             if (searchText.isNotEmpty &&
@@ -129,55 +121,46 @@ class _SearchPageState extends State<SearchPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       Text(
                         cancerInfo.keys.firstWhere(
-                              (key) => key.toLowerCase().contains(searchText.toLowerCase()),
+                          (key) => key
+                              .toLowerCase()
+                              .contains(searchText.toLowerCase()),
                         ),
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 10),
-
                       Text(
                         cancerInfo[cancerInfo.keys.firstWhere(
-                              (key) => key.toLowerCase().contains(searchText.toLowerCase()),
+                          (key) => key
+                              .toLowerCase()
+                              .contains(searchText.toLowerCase()),
                         )]!,
                         style: const TextStyle(fontSize: 16),
                       ),
-
                     ],
                   ),
                 ),
               ),
             const SizedBox(height: 25),
-
-
             const SizedBox(height: 20),
-
-
             ListTile(
               leading: Icon(Icons.history),
               title: Text("Breast Cancer"),
             ),
-
             ListTile(
               leading: Icon(Icons.history),
               title: Text("Skin Cancer"),
             ),
-
             ListTile(
               leading: Icon(Icons.history),
               title: Text("Symptoms"),
             ),
-
             const SizedBox(height: 30),
-
             const SizedBox(height: 20),
-
           ],
         ),
       ),
