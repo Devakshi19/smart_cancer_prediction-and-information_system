@@ -14,9 +14,12 @@ class UterineCancerCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => Scaffold(
-                // <- NO NEW FILE NEEDED
                 appBar: AppBar(
-                  title: const Text("Uterine Cancer Details"),
+                  title: const Text("UTERINE CANCER DETAILS",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),),
                   backgroundColor: Color.fromARGB(255, 156, 153, 227),
                   foregroundColor: Colors.white,
                 ),
@@ -29,10 +32,6 @@ class UterineCancerCard extends StatelessWidget {
               ),
             ),
           );
-
-          // Navigate to Lung Cancer Page
-          // Navigator.push(context,
-          // MaterialPageRoute(builder: (context) => LungCancerPage()));
         },
         child: Container(
           height: 180,
