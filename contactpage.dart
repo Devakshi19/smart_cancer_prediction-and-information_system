@@ -133,11 +133,16 @@ class ContactPage extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
+                        color:Colors.black,
                     ),
                   ),
                   SizedBox(height: 5),
                   Text(
                     "B.Tech IT Students\nIndus University",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color:Colors.black,),
                     textAlign: TextAlign.center,
                   ),
                 ],
