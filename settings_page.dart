@@ -1,7 +1,6 @@
-// lib/settings_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../main.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -11,7 +10,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  // Setting States
   bool _isDarkMode = false;
   bool _enableNotifications = true;
   bool _enableReminders = true;
@@ -25,18 +23,16 @@ class _SettingsPageState extends State<SettingsPage> {
     _loadSettings();
   }
 
-  // Load saved settings from SharedPreferences
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _isDarkMode = prefs.getBool('isDarkMode') ?? false;
+      _isDarkMode = ThemeManager.instance.themeMode == ThemeMode.dark;
       _enableNotifications = prefs.getBool('enableNotifications') ?? true;
       _enableReminders = prefs.getBool('enableReminders') ?? true;
-      _selectedLanguage = prefs.getString('selectedLanguage') ?? 'English';
+      _selectedLanguage = AppState.languageNotifier.value;
     });
   }
 
-  // Save setting changes locally
   Future<void> _saveBoolSetting(String key, bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(key, value);
@@ -46,8 +42,6 @@ class _SettingsPageState extends State<SettingsPage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, value);
   }
-
-  // Section Header Helper
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -67,21 +61,13 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "SETTINGS",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text(AppState.tr('settings')),
         backgroundColor: const Color(0xFF9A95E8),
         foregroundColor: Colors.white,
       ),
       body: ListView(
         children: [
           const SizedBox(height: 10),
-
-          // --- APPEARANCE SECTION ---
           _buildSectionHeader("Appearance"),
           SwitchListTile(
             secondary:
@@ -89,15 +75,12 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text("Dark Mode"),
             subtitle: const Text("Switch to dark theme interface"),
             value: _isDarkMode,
-            activeColor: const Color(0xFF9A95E8),
-            onChanged: (bool value) {
+            activeTrackColor: const Color(0xFF9A95E8),
+            onChanged: (bool value) async {
               setState(() {
                 _isDarkMode = value;
               });
-              _saveBoolSetting('isDarkMode', value);
-
-              // Note: To dynamically apply dark theme app-wide,
-              // notify your MaterialApp theme state here if using Provider / ValueNotifier.
+              AppState.toggleTheme(value);
             },
           ),
 
@@ -113,8 +96,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
 
           const Divider(),
-
-          // --- NOTIFICATIONS & REMINDERS SECTION ---
           _buildSectionHeader("Notifications & Reminders"),
           SwitchListTile(
             secondary: const Icon(Icons.notifications_active_outlined,
@@ -122,7 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text("Push Notifications"),
             subtitle: const Text("Receive health tips & scan report alerts"),
             value: _enableNotifications,
-            activeColor: const Color(0xFF9A95E8),
+            activeTrackColor: const Color(0xFF9A95E8),
             onChanged: (bool value) {
               setState(() {
                 _enableNotifications = value;
@@ -136,7 +117,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text("Screening Reminders"),
             subtitle: const Text("Reminders for regular self-exams & checkups"),
             value: _enableReminders,
-            activeColor: const Color(0xFF9A95E8),
+            activeTrackColor: const Color(0xFF9A95E8),
             onChanged: (bool value) {
               setState(() {
                 _enableReminders = value;
@@ -146,8 +127,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
 
           const Divider(),
-
-          // --- PRIVACY & DATA SECTION ---
           _buildSectionHeader("Privacy & Storage"),
           ListTile(
             leading: const Icon(Icons.cleaning_services_outlined,
@@ -166,7 +145,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // Language Selection Dialog Box
   void _showLanguageDialog() {
     showDialog(
       context: context,
@@ -187,6 +165,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       _selectedLanguage = value;
                     });
                     _saveStringSetting('selectedLanguage', value);
+                    AppState.setLanguage(value);
                     Navigator.pop(context);
                   }
                 },
