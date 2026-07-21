@@ -7,19 +7,21 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF4F7FC),
-
       appBar: AppBar(
-        title: const Text("SCAN HISTORY"),
+        title: const Text(
+          "SCAN HISTORY",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: const Color(0xFF9C99E3),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-
       body: ListView(
         padding: const EdgeInsets.all(15),
-
         children: const [
-
           HistoryCard(
             cancerType: "Breast Cancer",
             date: "12 July 2026",
@@ -30,7 +32,6 @@ class HistoryPage extends StatelessWidget {
             icon: Icons.favorite,
             color: Colors.pink,
           ),
-
           SizedBox(height: 15),
           HistoryCard(
             cancerType: "Uterine cancer",
@@ -42,9 +43,7 @@ class HistoryPage extends StatelessWidget {
             icon: Icons.favorite,
             color: Colors.yellow,
           ),
-
           SizedBox(height: 15),
-
           HistoryCard(
             cancerType: "Skin Cancer",
             date: "10 July 2026",
@@ -55,9 +54,7 @@ class HistoryPage extends StatelessWidget {
             icon: Icons.health_and_safety,
             color: Colors.orange,
           ),
-
           SizedBox(height: 15),
-
           HistoryCard(
             cancerType: "Lung Cancer",
             date: "05 July 2026",
@@ -70,12 +67,10 @@ class HistoryPage extends StatelessWidget {
           ),
         ],
       ),
-
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF9C99E3),
         child: const Icon(Icons.download, color: Colors.white),
         onPressed: () {
-          // Download all reports
         },
       ),
     );
@@ -111,30 +106,22 @@ class HistoryCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
       ),
-
       child: Padding(
         padding: const EdgeInsets.all(15),
-
         child: Column(
           children: [
-
             Row(
               children: [
-
                 CircleAvatar(
                   radius: 26,
-                  // ignore: deprecated_member_use
                   backgroundColor: color.withOpacity(0.15),
                   child: Icon(icon, color: color, size: 28),
                 ),
-
                 const SizedBox(width: 15),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       Text(
                         cancerType,
                         style: const TextStyle(
@@ -142,9 +129,7 @@ class HistoryCard extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 5),
-
                       Text(
                         hospital,
                         style: TextStyle(
@@ -156,76 +141,57 @@ class HistoryCard extends StatelessWidget {
                 ),
               ],
             ),
-
             const Divider(height: 25),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-
                 const Text(
                   "Scan Date",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-
                 Text(date),
               ],
             ),
-
             const SizedBox(height: 8),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-
                 const Text(
                   "Time",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-
                 Text(time),
               ],
             ),
-
             const SizedBox(height: 8),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-
                 const Text(
                   "AI Result",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-
                 Chip(
                   backgroundColor: result == "Normal"
                       ? Colors.green.shade100
                       : Colors.red.shade100,
-
                   label: Text(
                     result,
                     style: TextStyle(
-                      color: result == "Normal"
-                          ? Colors.green
-                          : Colors.red,
+                      color: result == "Normal" ? Colors.green : Colors.red,
                     ),
                   ),
                 ),
               ],
             ),
-
             const SizedBox(height: 8),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-
                 const Text(
                   "Confidence",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-
                 Text(
                   confidence,
                   style: const TextStyle(
@@ -235,12 +201,9 @@ class HistoryCard extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 18),
-
             Row(
               children: [
-
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {},
@@ -252,9 +215,7 @@ class HistoryCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 10),
-
                 IconButton(
                   onPressed: () {},
                   icon: const Icon(
