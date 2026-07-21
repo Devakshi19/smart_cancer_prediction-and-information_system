@@ -14,9 +14,12 @@ class LungCancerCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => Scaffold(
-                // <- NO NEW FILE NEEDED
                 appBar: AppBar(
-                  title: const Text("Lung Cancer Details"),
+                  title: const Text("LUNG CANCER DETAILS",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),),
                   backgroundColor: Color.fromARGB(255, 156, 153, 227),
                   foregroundColor: Colors.white,
                 ),
@@ -124,4 +127,3 @@ class LungCancerCard extends StatelessWidget {
     );
   }
 }
-
