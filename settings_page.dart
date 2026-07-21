@@ -1,3 +1,5 @@
+// lib/settings_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
@@ -10,6 +12,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  // Setting States
   bool _isDarkMode = false;
   bool _enableNotifications = true;
   bool _enableReminders = true;
@@ -42,6 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, value);
   }
+
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -68,6 +72,8 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         children: [
           const SizedBox(height: 10),
+
+          // --- APPEARANCE SECTION ---
           _buildSectionHeader("Appearance"),
           SwitchListTile(
             secondary:
@@ -80,6 +86,7 @@ class _SettingsPageState extends State<SettingsPage> {
               setState(() {
                 _isDarkMode = value;
               });
+              // Triggers global theme change through AppState & ThemeManager
               AppState.toggleTheme(value);
             },
           ),
@@ -96,6 +103,8 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
 
           const Divider(),
+
+          // --- NOTIFICATIONS & REMINDERS SECTION ---
           _buildSectionHeader("Notifications & Reminders"),
           SwitchListTile(
             secondary: const Icon(Icons.notifications_active_outlined,
@@ -127,6 +136,8 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
 
           const Divider(),
+
+          // --- PRIVACY & DATA SECTION ---
           _buildSectionHeader("Privacy & Storage"),
           ListTile(
             leading: const Icon(Icons.cleaning_services_outlined,
@@ -145,6 +156,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  // Language Selection Dialog Box
   void _showLanguageDialog() {
     showDialog(
       context: context,
@@ -165,7 +177,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       _selectedLanguage = value;
                     });
                     _saveStringSetting('selectedLanguage', value);
+
+                    // Dynamically update the app-wide language state
                     AppState.setLanguage(value);
+
                     Navigator.pop(context);
                   }
                 },
