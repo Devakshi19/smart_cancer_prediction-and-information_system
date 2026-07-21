@@ -20,7 +20,6 @@ class UserSession {
     await prefs.setBool('isLoggedIn', true);
   }
 
-  // Retrieve user details
   static Future<Map<String, String>> getUser() async {
     final prefs = await SharedPreferences.getInstance();
     return {
@@ -33,7 +32,6 @@ class UserSession {
     };
   }
 
-  // Clear user details on logout
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
