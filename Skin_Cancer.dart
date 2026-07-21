@@ -77,10 +77,6 @@ class SkinCancerCard extends StatelessWidget {
               ),
             ),
           );
-
-          // Navigate to Lung Cancer Page
-          // Navigator.push(context,
-          // MaterialPageRoute(builder: (context) => LungCancerPage()));
         },
         child: Container(
           height: 180,
