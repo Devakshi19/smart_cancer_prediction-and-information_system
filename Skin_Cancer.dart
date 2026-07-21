@@ -14,7 +14,6 @@ class SkinCancerCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => Scaffold(
-                // <- NO NEW FILE NEEDED
                 appBar: AppBar(
                   title: const Text("SKIN CANCER DETAILS",
                     style: TextStyle(
