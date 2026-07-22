@@ -4,8 +4,6 @@ import 'package:project/screens/settings_page.dart';
 import 'package:project/screens/user_session.dart';
 import 'screens.dart';
 import 'widgets.dart';
-
-// --- THEME MANAGER CLASS ---
 class ThemeManager extends ChangeNotifier {
   static ThemeManager? _instance;
   ThemeManager._();
@@ -18,7 +16,6 @@ class ThemeManager extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light;
   ThemeMode get themeMode => _themeMode;
 
-  // Load saved theme when app starts
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     bool isDark = prefs.getBool('isDarkMode') ?? false;
@@ -26,7 +23,6 @@ class ThemeManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Toggle and save theme
   Future<void> toggleTheme(bool isDark) async {
     _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
     final prefs = await SharedPreferences.getInstance();
@@ -35,13 +31,11 @@ class ThemeManager extends ChangeNotifier {
   }
 }
 
-// --- APP STATE FOR TRANSLATIONS & THEME ACCESS ---
 class AppState {
   static final ValueNotifier<String> languageNotifier =
-      ValueNotifier('English');
+  ValueNotifier('English');
 
   static Future<void> init() async {
-    // Load theme from SharedPreferences
     await ThemeManager.instance.loadTheme();
   }
 
@@ -52,8 +46,6 @@ class AppState {
   static void setLanguage(String lang) {
     languageNotifier.value = lang;
   }
-
-  // Dictionary mapping
   static final Map<String, Map<String, String>> _localizedValues = {
     'English': {
       'app_title': 'CANCER DETECTION APP',
@@ -180,8 +172,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _loadDrawerUserData();
   }
-
-  // Fetch logged-in user data for the Navigation Drawer
   Future<void> _loadDrawerUserData() async {
     final userData = await UserSession.getUser();
     setState(() {
@@ -189,8 +179,6 @@ class _HomePageState extends State<HomePage> {
       currentUserEmail = userData['email'] ?? "AI-Based Cancer Detection";
     });
   }
-
-  // Modal Sheet for Central Scan Button
   void _showQuickScanModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -211,7 +199,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 15),
               ListTile(
                 leading:
-                    const Icon(Icons.clean_hands, color: Color(0xFF9A95E8)),
+                const Icon(Icons.clean_hands, color: Color(0xFF9A95E8)),
                 title: const Text("Skin Cancer Detection"),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
@@ -221,7 +209,7 @@ class _HomePageState extends State<HomePage> {
               ),
               ListTile(
                 leading:
-                    const Icon(Icons.personal_injury, color: Color(0xFF9A95E8)),
+                const Icon(Icons.personal_injury, color: Color(0xFF9A95E8)),
                 title: const Text("Lung Cancer (Chest X-Ray)"),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
@@ -347,7 +335,9 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pop(context);
                 await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePage(userData: {},), // Removed userData parameter
+                  ),
                 );
                 _loadDrawerUserData();
               },
@@ -423,14 +413,13 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 );
-
                 if (logout == true) {
                   await UserSession.logout();
-                  if (!mounted) return;
+                  if (!context.mounted) return;
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => const LoginPage()),
-                    (route) => false,
+                        (route) => false,
                   );
                 }
               },
