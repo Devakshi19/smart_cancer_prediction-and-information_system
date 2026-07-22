@@ -3,33 +3,37 @@ import 'package:flutter/material.dart';
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});
 
-  Widget contactTile(IconData icon, String title, String subtitle) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.deepPurple),
-        title: Text(title),
-        subtitle: Text(subtitle),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    // Detect theme mode
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    // Theme Color Palette
+    const primaryAccent = Color.fromARGB(255, 156, 153, 227);
+    final backgroundColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
+    final cardColor = isDarkMode ? const Color(0xFF1E1E24) : Colors.white;
+    final titleColor = isDarkMode ? Colors.white : Colors.black87;
+    final subtitleColor = isDarkMode ? Colors.white70 : Colors.black54;
+
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: const Text(
           "CONTACT US",
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
+            letterSpacing: 0.8,
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 156, 153, 227),
+        backgroundColor: primaryAccent,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(15),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const CircleAvatar(
             radius: 45,
@@ -40,117 +44,244 @@ class ContactPage extends StatelessWidget {
               size: 45,
             ),
           ),
-          const SizedBox(height: 15),
-          const Center(
-            child: Text(
-              "Contact Our Support Team",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+          Center(
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  Text(
+                    "Contact Our Support Team",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: titleColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "We're here to help you 24/7",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: subtitleColor,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
             ),
-          ),
-          const SizedBox(height: 5),
-          const Center(
-            child: Text(
-              "We're here to help you 24/7",
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 15,
-              ),
+
+            // 1. Email Tile
+            _buildContactTile(
+              icon: Icons.email,
+              title: "Email",
+              subtitle: "cancerdetection26@gmail.com",
+              cardColor: cardColor,
+              titleColor: titleColor,
+              subtitleColor: subtitleColor,
+              iconColor: primaryAccent,
             ),
-          ),
-          const SizedBox(height: 25),
-          contactTile(
-            Icons.email,
-            "Email",
-            "cancerdetection26@gmail.com",
-          ),
-          contactTile(
-            Icons.phone,
-            "Phone",
-            "+91 xxxxxxxxxx",
-          ),
-          contactTile(
-            Icons.language,
-            "Website",
-            "www.cancerdetection.com",
-          ),
-          contactTile(
-            Icons.local_hospital,
-            "Emergency Helpline",
-            "108",
-          ),
-          const SizedBox(height: 20),
-          Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+
+            // 2. Phone Tile
+            _buildContactTile(
+              icon: Icons.phone,
+              title: "Phone",
+              subtitle: "+91 xxxxxxxxxx",
+              cardColor: cardColor,
+              titleColor: titleColor,
+              subtitleColor: subtitleColor,
+              iconColor: primaryAccent,
             ),
-            child: const Padding(
-              padding: EdgeInsets.all(16),
+
+            // 3. Website Tile
+            _buildContactTile(
+              icon: Icons.language,
+              title: "Website",
+              subtitle: "www.cancerdetection.com",
+              cardColor: cardColor,
+              titleColor: titleColor,
+              subtitleColor: subtitleColor,
+              iconColor: primaryAccent,
+            ),
+
+            // 4. Emergency Helpline Tile
+            _buildContactTile(
+              icon: Icons.medical_services,
+              title: "Emergency Helpline",
+              subtitle: "108",
+              cardColor: cardColor,
+              titleColor: titleColor,
+              subtitleColor: subtitleColor,
+              iconColor: primaryAccent,
+            ),
+
+            const SizedBox(height: 12),
+
+            // About Us Card
+            _buildAboutUsCard(
+              cardColor: cardColor,
+              titleColor: titleColor,
+              textColor: subtitleColor,
+            ),
+
+            const SizedBox(height: 12),
+
+            // Developed By Card
+            _buildDevelopedByCard(
+              cardColor: cardColor,
+              titleColor: titleColor,
+              subtitleColor: subtitleColor,
+              iconColor: primaryAccent,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper Widget: Contact Info Tile
+  Widget _buildContactTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color cardColor,
+    required Color titleColor,
+    required Color subtitleColor,
+    required Color iconColor,
+  }) {
+    return Card(
+      color: cardColor,
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Icon(icon, color: iconColor, size: 24),
+            const SizedBox(width: 16),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "About Us",
+                    title,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: titleColor,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 2),
                   Text(
-                    "Our Cancer Detection application uses Artificial Intelligence "
-                    "to assist users in identifying possible cancer risks from "
-                    "medical images. This app is intended for educational and "
-                    "screening support only and should not replace professional "
-                    "medical advice.",
-                    style: TextStyle(fontSize: 15),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Card(
-            color: Color.fromARGB(255, 240, 236, 255),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.all(15),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.code,
-                    color: Colors.deepPurple,
-                    size: 35,
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "Developed By",
+                    subtitle,
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                        color:Colors.black,
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    "B.Tech IT Students\nIndus University",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
                       fontSize: 14,
-                      color:Colors.black,),
-                    textAlign: TextAlign.center,
+                      color: subtitleColor,
+                    ),
                   ),
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper Widget: About Us
+  Widget _buildAboutUsCard({
+    required Color cardColor,
+    required Color titleColor,
+    required Color textColor,
+  }) {
+    return Card(
+      color: cardColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "About Us",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: titleColor,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Our Cancer Detection application uses Artificial Intelligence to assist users in identifying possible cancer risks from medical images. This app is intended for educational and screening support only and should not replace professional medical advice.",
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.5,
+                color: textColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper Widget: Developed By
+  Widget _buildDevelopedByCard({
+    required Color cardColor,
+    required Color titleColor,
+    required Color subtitleColor,
+    required Color iconColor,
+  }) {
+    return Card(
+      color: cardColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(
+                Icons.code,
+                color: iconColor,
+                size: 28,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Developed By",
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: titleColor,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "B.Tech IT Students",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: subtitleColor,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                "Indus University",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: subtitleColor,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-        ],
+        ),
       ),
     );
   }
