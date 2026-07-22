@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:project/api_service.dart';
 import 'package:project/main.dart';
 import 'signup.dart';
-import 'package:project/screens/api_service.dart';
 import 'user_session.dart';
 
 class LoginPage extends StatefulWidget {
@@ -74,7 +73,11 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login"),
+        title: const Text("LOGIN",
+        style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        ),),
         backgroundColor: const Color(0xFF9A95E8),
         foregroundColor: Colors.white,
       ),
