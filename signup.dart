@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project/api_service.dart';
 import 'login.dart';
-import 'api_service.dart';
 import 'user_session.dart';
 
 class SignupPage extends StatefulWidget {
@@ -76,9 +75,9 @@ class _SignupPageState extends State<SignupPage> {
         title: const Text(
           "SIGN UP",
           style: TextStyle(color: Colors.white,
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-        ),),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),),
         backgroundColor: const Color(0xFF9A95E8),
         foregroundColor: Colors.white,
       ),
@@ -131,15 +130,15 @@ class _SignupPageState extends State<SignupPage> {
                   onPressed: _isLoading ? null : _handleSignup,
                   child: _isLoading
                       ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2),
-                        )
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2),
+                  )
                       : const Text(
-                          "SIGN UP",
-                          style: TextStyle(color: Colors.white),
-                        ),
+                    "SIGN UP",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
               const SizedBox(height: 15),
