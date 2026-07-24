@@ -14,24 +14,21 @@ class UterineCancerCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => Scaffold(
-                // <- NO NEW FILE NEEDED
                 appBar: AppBar(
-                  title: const Text("UTERINE CANCER DETAILS",
+                  title: const Text(
+                    "UTERINE CANCER DETAILS",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                    ),),
-                  backgroundColor: Color.fromARGB(255, 156, 153, 227),
+                    ),
+                  ),
+                  backgroundColor: const Color.fromARGB(255, 156, 153, 227),
                   foregroundColor: Colors.white,
                 ),
                 body: const UterineCancerDetailsPage(),
               ),
             ),
           );
-
-          // Navigate to Lung Cancer Page
-          // Navigator.push(context,
-          // MaterialPageRoute(builder: (context) => LungCancerPage()));
         },
         child: Container(
           height: 180,
@@ -127,11 +124,111 @@ class UterineCancerCard extends StatelessWidget {
     );
   }
 }
-class UterineCancerDetailsPage extends StatelessWidget {
+
+class UterineCancerDetailsPage extends StatefulWidget {
   const UterineCancerDetailsPage({super.key});
 
   @override
+  State<UterineCancerDetailsPage> createState() => _UterineCancerDetailsPageState();
+}
+
+class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  final List<Map<String, String>> _allDoctors = [
+    {
+      'name': 'Dr Viral Patel',
+      'specialization': 'Gynecologic Oncologist\nUterine, Ovarian & Cervical Cancer',
+      'experience': '10–12+ Years',
+      'hospital': 'HCG Aastha Cancer Centre',
+      'location': 'Sola, Ahmedabad, Gujarat',
+      'address': 'Bhagwat Vidyapith Road, Opp. Bhagwat Vidyapith Gate, Sola, Ahmedabad - 380060',
+      'phone': '+91 77365 24011',
+    },
+    {
+      'name': 'Dr Swati Shah',
+      'specialization': 'Gynecologic Oncologist\nRobotic Cancer Surgeon\nUterus, Ovary & Cervix Cancer',
+      'experience': '10+ Years',
+      'hospital': 'Shahs Cancer & Robotic Surgery Centre',
+      'location': 'Gota, Ahmedabad, Gujarat',
+      'address': 'SF-203 Olive Greens, SG Highway, Gota, Ahmedabad - 382481',
+      'phone': '+91 89800 20898',
+    },
+    {
+      'name': 'Dr Mona Naman Shah',
+      'specialization': 'Gynecologic Oncosurgeon\nRobotic Surgeon',
+      'experience': 'Not publicly available',
+      'hospital': 'Zydus Cancer Centre',
+      'location': 'Thaltej, Ahmedabad, Gujarat',
+      'address': 'Zydus Hospital Road, Thaltej, Ahmedabad - 380054',
+      'phone': '+91 98795 05063',
+    },
+    {
+      'name': 'Dr Nishtha Tripathi Patel',
+      'specialization': 'Gynecologic Oncologist\nUterine, Ovarian & Cervical Cancer',
+      'experience': '12+ Years',
+      'hospital': 'Sterling Hospital',
+      'location': 'Ahmedabad, Gujarat',
+      'address': 'Sterling Hospital, Sindhu Bhavan Road, Ahmedabad',
+      'phone': '+91 76988 00333',
+    },
+    {
+      'name': 'Dr Ankit Shah',
+      'specialization': 'Gynecological Cancer Surgeon\nSurgical Oncologist',
+      'experience': 'Not publicly available',
+      'hospital': 'Shastriji Maharaj Hospital',
+      'location': 'Atladara, Vadodara, Gujarat',
+      'address': 'Shastriji Maharaj Hospital Circle, Narayanwadi, Atladara, Vadodara - 390007',
+      'phone': '+91 97714 15510',
+    },
+    {
+      'name': 'Dr Viral Patel',
+      'specialization': 'Gynecologic Oncologist',
+      'experience': '10–12+ Years',
+      'hospital': 'Synergy Superspeciality Hospital',
+      'location': 'Rajkot, Gujarat',
+      'address': 'Synergy Circle, 150 Feet Ring Road, Opp. Gokul Mathura Apartment, Rajkot - 360005',
+      'phone': '+91 77365 24011',
+    },
+    {
+      'name': 'Dr Amit Gupta',
+      'specialization': 'Surgical Oncologist\nGynecologic & Uterine Cancer Surgery',
+      'experience': 'Not publicly available',
+      'hospital': 'Surat Oncology Centre',
+      'location': 'Surat, Gujarat',
+      'address': 'Second Floor, Zenon Building, Opp. Unique Hospital, Near Kiran Motors, Khatodra Wadi, Surat - 395002',
+      'phone': '+91 97372 67579',
+    },
+    {
+      'name': 'Dr Jignesh Shah',
+      'specialization': 'Gynecologic Oncology\nUterine, Ovarian & Cervical Cancer',
+      'experience': 'Not publicly available',
+      'hospital': 'The Gujarat Cancer & Research Institute (GCRI)',
+      'location': 'Asarwa, Ahmedabad, Gujarat',
+      'address': 'Civil Hospital Campus, Haripura, Asarwa, Ahmedabad - 380016',
+      'phone': '+91 79 2268 8000',
+    },
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Filter doctors list based on search query
+    final filteredDoctors = _allDoctors.where((doctor) {
+      final query = _searchQuery.toLowerCase();
+      return doctor['name']!.toLowerCase().contains(query) ||
+          doctor['specialization']!.toLowerCase().contains(query) ||
+          doctor['hospital']!.toLowerCase().contains(query) ||
+          doctor['location']!.toLowerCase().contains(query) ||
+          doctor['experience']!.toLowerCase().contains(query);
+    }).toList();
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -139,7 +236,7 @@ class UterineCancerDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Find a uterine  Cancer Specialist",
+              "Find a Uterine Cancer Specialist",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -147,6 +244,12 @@ class UterineCancerDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
               decoration: InputDecoration(
                 hintText: "Search Doctor",
                 prefixIcon: const Icon(Icons.search),
@@ -173,106 +276,17 @@ class UterineCancerDetailsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Column(
-              children: [
-
-                doctorCard(
-                  context,
-                  doctorName: "Dr Viral Patel",
-                  specialization:
-                  "Gynecologic Oncologist\nUterine, Ovarian & Cervical Cancer",
-                  hospital: "HCG Aastha Cancer Centre",
-                  location: "Sola, Ahmedabad, Gujarat",
-                  address:
-                  "Bhagwat Vidyapith Road, Opp. Bhagwat Vidyapith Gate, Sola, Ahmedabad - 380060",
-                  phone: "+91 77365 24011",
-                ),
-
-                doctorCard(
-                  context,
-                  doctorName: "Dr Swati Shah",
-                  specialization:
-                  "Gynecologic Oncologist\nRobotic Cancer Surgeon\nUterus, Ovary & Cervix Cancer",
-                  hospital: "Shahs Cancer & Robotic Surgery Centre",
-                  location: "Gota, Ahmedabad, Gujarat",
-                  address:
-                  "SF-203 Olive Greens, SG Highway, Gota, Ahmedabad - 382481",
-                  phone: "+91 89800 20898",
-                ),
-
-                doctorCard(
-                  context,
-                  doctorName: "Dr Mona Naman Shah",
-                  specialization:
-                  "Gynecologic Oncosurgeon\nRobotic Surgeon",
-                  hospital: "Zydus Cancer Centre",
-                  location: "Thaltej, Ahmedabad, Gujarat",
-                  address:
-                  "Zydus Hospital Road, Thaltej, Ahmedabad - 380054",
-                  phone: "+91 98795 05063",
-                ),
-
-                doctorCard(
-                  context,
-                  doctorName: "Dr Nishtha Tripathi Patel",
-                  specialization:
-                  "Gynecologic Oncologist\nUterine, Ovarian & Cervical Cancer",
-                  hospital: "Sterling Hospital",
-                  location: "Ahmedabad, Gujarat",
-                  address:
-                  "Sterling Hospital, Sindhu Bhavan Road, Ahmedabad",
-                  phone: "+91 76988 00333",
-                ),
-
-                doctorCard(
-                  context,
-                  doctorName: "Dr Ankit Shah",
-                  specialization:
-                  "Gynecological Cancer Surgeon\nSurgical Oncologist",
-                  hospital: "Shastriji Maharaj Hospital",
-                  location: "Atladara, Vadodara, Gujarat",
-                  address:
-                  "Shastriji Maharaj Hospital Circle, Narayanwadi, Atladara, Vadodara - 390007",
-                  phone: "+91 97714 15510",
-                ),
-
-                doctorCard(
-                  context,
-                  doctorName: "Dr Viral Patel",
-                  specialization:
-                  "Gynecologic Oncologist",
-                  hospital: "Synergy Superspeciality Hospital",
-                  location: "Rajkot, Gujarat",
-                  address:
-                  "Synergy Circle, 150 Feet Ring Road, Opp. Gokul Mathura Apartment, Rajkot - 360005",
-                  phone: "+91 77365 24011",
-                ),
-
-                doctorCard(
-                  context,
-                  doctorName: "Dr Amit Gupta",
-                  specialization:
-                  "Surgical Oncologist\nGynecologic & Uterine Cancer Surgery",
-                  hospital: "Surat Oncology Centre",
-                  location: "Surat, Gujarat",
-                  address:
-                  "Second Floor, Zenon Building, Opp. Unique Hospital, Near Kiran Motors, Khatodra Wadi, Surat - 395002",
-                  phone: "+91 97372 67579",
-                ),
-
-                doctorCard(
-                  context,
-                  doctorName: "Dr Jignesh Shah",
-                  specialization:
-                  "Gynecologic Oncology\nUterine, Ovarian & Cervical Cancer",
-                  hospital: "The Gujarat Cancer & Research Institute (GCRI)",
-                  location: "Asarwa, Ahmedabad, Gujarat",
-                  address:
-                  "Civil Hospital Campus, Haripura, Asarwa, Ahmedabad - 380016",
-                  phone: "+91 79 2268 8000",
-                ),
-
-              ],
+            ...filteredDoctors.map(
+                  (doctor) => doctorCard(
+                context,
+                doctorName: doctor['name']!,
+                specialization: doctor['specialization']!,
+                experience: doctor['experience']!,
+                hospital: doctor['hospital']!,
+                location: doctor['location']!,
+                address: doctor['address']!,
+                phone: doctor['phone']!,
+              ),
             ),
           ],
         ),
@@ -295,6 +309,7 @@ class UterineCancerDetailsPage extends StatelessWidget {
       BuildContext context, {
         required String doctorName,
         required String specialization,
+        required String experience,
         required String hospital,
         required String location,
         required String address,
@@ -302,6 +317,10 @@ class UterineCancerDetailsPage extends StatelessWidget {
       }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    final String experienceText = experience.toLowerCase().contains("available")
+        ? "Experience: $experience"
+        : "$experience Experience";
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -342,6 +361,27 @@ class UterineCancerDetailsPage extends StatelessWidget {
                             fontSize: 13,
                             color: theme.textTheme.bodySmall?.color ?? Colors.grey[600],
                           ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.work_history_outlined,
+                              size: 14,
+                              color: Color(0xFF9A95E8),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                experienceText,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF9A95E8),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
