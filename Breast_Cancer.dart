@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class BreastCancerCard extends StatelessWidget {
   const BreastCancerCard({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -16,12 +15,14 @@ class BreastCancerCard extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => Scaffold(
                 appBar: AppBar(
-                  title: const Text("BREAST CANCER DETAILS",
+                  title: const Text(
+                    "BREAST CANCER DETAILS",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                    ),),
-                  backgroundColor: Color.fromARGB(255, 156, 153, 227),
+                    ),
+                  ),
+                  backgroundColor: const Color.fromARGB(255, 156, 153, 227),
                   foregroundColor: Colors.white,
                 ),
                 body: const BreastCancerDetailsPage(),
@@ -29,7 +30,6 @@ class BreastCancerCard extends StatelessWidget {
             ),
           );
         },
-
         child: Container(
           height: 180,
           decoration: BoxDecoration(
@@ -124,11 +124,119 @@ class BreastCancerCard extends StatelessWidget {
     );
   }
 }
-class BreastCancerDetailsPage extends StatelessWidget {
+
+class BreastCancerDetailsPage extends StatefulWidget {
   const BreastCancerDetailsPage({super.key});
 
   @override
+  State<BreastCancerDetailsPage> createState() =>
+      _BreastCancerDetailsPageState();
+}
+
+class _BreastCancerDetailsPageState extends State<BreastCancerDetailsPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  final List<Map<String, String>> _allDoctors = [
+    {
+      'name': 'Dr Noopur Patel',
+      'specialization': 'Breast Cancer Surgeon\nBreast Surgical Oncology',
+      'experience': '8+ Years',
+      'hospital': 'Marengo CIMS Hospital',
+      'location': 'Sola, Ahmedabad, Gujarat',
+      'address':
+      'Plot No. 67/1, Off Science City Road, Opp. Panchamrut Bunglows, Sola, Ahmedabad - 380060',
+      'phone': '+91 79 3010 1257',
+    },
+    {
+      'name': 'Dr Shalin Shah',
+      'specialization': 'Breast Cancer Surgeon\nSurgical Oncologist',
+      'experience': '10+ Years',
+      'hospital': 'SSO Cancer Hospital',
+      'location': 'Bodakdev, Ahmedabad, Gujarat',
+      'address':
+      'Opp. Pandit Deendayal Upadhyay Auditorium Hall, Behind Rajpath Rangoli Road, Bodakdev, Ahmedabad - 380054',
+      'phone': '+91 89768 97202',
+    },
+    {
+      'name': 'Dr Priyanka Chiripal',
+      'specialization': 'Breast Cancer & Medical Oncology',
+      'experience': '12+ Years',
+      'hospital': 'Zydus Cancer Hospital',
+      'location': 'Thaltej, Ahmedabad, Gujarat',
+      'address':
+      'Zydus Hospital, Sarkhej-Gandhinagar Highway, Thaltej, Ahmedabad - 380059',
+      'phone': '+91 98254 00705',
+    },
+    {
+      'name': 'Dr Honey Parekh',
+      'specialization': 'Medical Oncologist\nBreast Cancer & Chemotherapy',
+      'experience': '10+ Years',
+      'hospital': 'V Care Hospital',
+      'location': 'Surat, Gujarat',
+      'address':
+      '501 V Care Hospital, The Commercial Hub, Opp. Rajhans Olympia, Surat - 395001',
+      'phone': '+91 90164 46014',
+    },
+    {
+      'name': 'Dr Jayesh A Prajapati',
+      'specialization':
+      'Breast & Gynecologic Cancer Surgeon\nRobotic Surgical Oncology',
+      'experience': '15+ Years',
+      'hospital': 'Wacha Clinic',
+      'location': 'Ahmedabad, Gujarat',
+      'address':
+      '1001-1021, 10th Floor, Sun Avenue One Building, Behind Shreyas Foundation, Shyamal Cross Road, Ahmedabad - 380015',
+      'phone': '+91 79 4800 4800',
+    },
+    {
+      'name': 'Dr Ankit Shah',
+      'specialization': 'Breast Oncoplasty\nBreast Cancer Surgeon',
+      'experience': 'Not publicly available',
+      'hospital': 'Shastriji Maharaj Hospital',
+      'location': 'Atladara, Vadodara, Gujarat',
+      'address':
+      'Shastriji Maharaj Hospital Circle, Narayanwadi, Atladara, Vadodara - 390012',
+      'phone': '+91 97714 15510',
+    },
+    {
+      'name': 'Dr Ekta Vala Chandarana',
+      'specialization': 'Medical Oncologist\nBreast Cancer',
+      'experience': '10+ Years',
+      'hospital': 'Medisquare Superspeciality Hospital',
+      'location': 'Ahmedabad, Gujarat',
+      'address': 'Medisquare Superspeciality Hospital, Ahmedabad, Gujarat',
+      'phone': '+91 88668 43843',
+    },
+    {
+      'name': 'Dr Mihir Shah',
+      'specialization': 'Surgical Oncologist\nBreast Cancer Surgery',
+      'experience': '12+ Years',
+      'hospital': 'Shalby Cancer & Research Institute (SCRI)',
+      'location': 'SG Highway, Ahmedabad, Gujarat',
+      'address':
+      '3rd Floor, SCRI, Shalby Hospitals, Opp. Karnavati Club, SG Highway, Ahmedabad - 380015',
+      'phone': '+91 70692 59255',
+    },
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final filteredDoctors = _allDoctors.where((doctor) {
+      final query = _searchQuery.toLowerCase();
+      return doctor['name']!.toLowerCase().contains(query) ||
+          doctor['specialization']!.toLowerCase().contains(query) ||
+          doctor['hospital']!.toLowerCase().contains(query) ||
+          doctor['location']!.toLowerCase().contains(query) ||
+          doctor['experience']!.toLowerCase().contains(query);
+    }).toList();
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -136,7 +244,7 @@ class BreastCancerDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Find a breast Cancer Specialist",
+              "Find a Breast Cancer Specialist",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -144,12 +252,19 @@ class BreastCancerDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
               decoration: InputDecoration(
                 hintText: "Search Doctor",
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Theme.of(context).cardColor,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
@@ -170,84 +285,17 @@ class BreastCancerDetailsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            doctorCard(
-              context,
-              doctorName: "Dr Noopur Patel",
-              specialization: "Breast Cancer Surgeon\nBreast Surgical Oncology",
-              hospital: "Marengo CIMS Hospital",
-              location: "Sola, Ahmedabad, Gujarat",
-              address: "Plot No. 67/1, Off Science City Road, Opp. Panchamrut Bunglows, Sola, Ahmedabad - 380060",
-              phone: "+91 79 3010 1257",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Shalin Shah",
-              specialization: "Breast Cancer Surgeon\nSurgical Oncologist",
-              hospital: "SSO Cancer Hospital",
-              location: "Bodakdev, Ahmedabad, Gujarat",
-              address: "Opp. Pandit Deendayal Upadhyay Auditorium Hall, Behind Rajpath Rangoli Road, Bodakdev, Ahmedabad - 380054",
-              phone: "+91 89768 97202",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Priyanka Chiripal",
-              specialization: "Breast Cancer & Medical Oncology",
-              hospital: "Zydus Cancer Hospital",
-              location: "Thaltej, Ahmedabad, Gujarat",
-              address: "Zydus Hospital, Sarkhej-Gandhinagar Highway, Thaltej, Ahmedabad - 380059",
-              phone: "+91 98254 00705",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Honey Parekh",
-              specialization: "Medical Oncologist\nBreast Cancer & Chemotherapy",
-              hospital: "V Care Hospital",
-              location: "Surat, Gujarat",
-              address: "501 V Care Hospital, The Commercial Hub, Opp. Rajhans Olympia, Surat - 395001",
-              phone: "+91 90164 46014",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Jayesh A Prajapati",
-              specialization: "Breast & Gynecologic Cancer Surgeon\nRobotic Surgical Oncology",
-              hospital: "Wacha Clinic",
-              location: "Ahmedabad, Gujarat",
-              address: "1001-1021, 10th Floor, Sun Avenue One Building, Behind Shreyas Foundation, Shyamal Cross Road, Ahmedabad - 380015",
-              phone: "+91 79 4800 4800",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Ankit Shah",
-              specialization: "Breast Oncoplasty\nBreast Cancer Surgeon",
-              hospital: "Shastriji Maharaj Hospital",
-              location: "Atladara, Vadodara, Gujarat",
-              address: "Shastriji Maharaj Hospital Circle, Narayanwadi, Atladara, Vadodara - 390012",
-              phone: "+91 97714 15510",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Ekta Vala Chandarana",
-              specialization: "Medical Oncologist\nBreast Cancer",
-              hospital: "Medisquare Superspeciality Hospital",
-              location: "Ahmedabad, Gujarat",
-              address: "Medisquare Superspeciality Hospital, Ahmedabad, Gujarat",
-              phone: "+91 88668 43843",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Mihir Shah",
-              specialization: "Surgical Oncologist\nBreast Cancer Surgery",
-              hospital: "Shalby Cancer & Research Institute (SCRI)",
-              location: "SG Highway, Ahmedabad, Gujarat",
-              address: "3rd Floor, SCRI, Shalby Hospitals, Opp. Karnavati Club, SG Highway, Ahmedabad - 380015",
-              phone: "+91 70692 59255",
+            ...filteredDoctors.map(
+                  (doctor) => doctorCard(
+                context,
+                doctorName: doctor['name']!,
+                specialization: doctor['specialization']!,
+                experience: doctor['experience']!,
+                hospital: doctor['hospital']!,
+                location: doctor['location']!,
+                address: doctor['address']!,
+                phone: doctor['phone']!,
+              ),
             ),
           ],
         ),
@@ -261,7 +309,9 @@ class BreastCancerDetailsPage extends StatelessWidget {
       backgroundColor: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
+        side: BorderSide(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+        ),
       ),
     );
   }
@@ -270,6 +320,7 @@ class BreastCancerDetailsPage extends StatelessWidget {
       BuildContext context, {
         required String doctorName,
         required String specialization,
+        required String experience,
         required String hospital,
         required String location,
         required String address,
@@ -277,6 +328,11 @@ class BreastCancerDetailsPage extends StatelessWidget {
       }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    final String experienceText =
+    experience.toLowerCase().contains("available")
+        ? "Experience: $experience"
+        : "$experience Experience";
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -295,8 +351,13 @@ class BreastCancerDetailsPage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: isDark ? Colors.grey[800] : const Color(0xFFECEFF1),
-                    child: Icon(Icons.person, size: 32, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                    backgroundColor:
+                    isDark ? Colors.grey[800] : const Color(0xFFECEFF1),
+                    child: Icon(
+                      Icons.person,
+                      size: 32,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -315,8 +376,30 @@ class BreastCancerDetailsPage extends StatelessWidget {
                           specialization,
                           style: TextStyle(
                             fontSize: 13,
-                            color: theme.textTheme.bodySmall?.color ?? Colors.grey[600],
+                            color: theme.textTheme.bodySmall?.color ??
+                                Colors.grey[600],
                           ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.work_history_outlined,
+                              size: 14,
+                              color: Color(0xFF9A95E8),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                experienceText,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF9A95E8),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -326,7 +409,11 @@ class BreastCancerDetailsPage extends StatelessWidget {
               const Divider(height: 24),
               Row(
                 children: [
-                  Icon(Icons.local_hospital, size: 16, color: theme.iconTheme.color?.withValues(alpha: 0.6)),
+                  Icon(
+                    Icons.local_hospital,
+                    size: 16,
+                    color: theme.iconTheme.color?.withValues(alpha: 0.6),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -343,7 +430,11 @@ class BreastCancerDetailsPage extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.location_on, size: 16, color: theme.iconTheme.color?.withValues(alpha: 0.6)),
+                  Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: theme.iconTheme.color?.withValues(alpha: 0.6),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
