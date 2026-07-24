@@ -125,11 +125,124 @@ class SkinCancerCard extends StatelessWidget {
   }
 }
 
-class SkinCancerDetailsPage extends StatelessWidget {
+class SkinCancerDetailsPage extends StatefulWidget {
   const SkinCancerDetailsPage({super.key});
 
   @override
+  State<SkinCancerDetailsPage> createState() => _SkinCancerDetailsPageState();
+}
+
+class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  final List<Map<String, String>> _allDoctors = [
+    {
+      'name': 'Dr Murtuza I Laxmidhar',
+      'specialization': 'Surgical Oncologist\nSkin Cancer',
+      'experience': '22+ Years',
+      'hospital': 'Apollo Cancer Centre',
+      'location': 'Ellisbridge, Ahmedabad, Gujarat',
+      'address':
+          'Akshara Complex, 12 Shanti Sadan Co-op Housing Society Ltd., Near Parimal Garden, Ellisbridge, Ahmedabad - 380006',
+      'phone': '+91 79 4073 4073\n+91 84018 01066',
+      'imagePath': 'assets/Dr. Murtuza I. Laxmidhar.jpg',
+    },
+    {
+      'name': 'Dr V R N Vijay Kumar',
+      'specialization': 'Surgical Oncologist\nSkin Cancer',
+      'experience': '9+ Years',
+      'hospital': 'Apollo Hospital',
+      'location': 'Bhat, Gandhinagar, Gujarat',
+      'address':
+          'Block A, Apollo Hospitals International Ltd., Bhat GIDC Industrial Estate, Gandhinagar - 382428',
+      'phone': '+91 83695 64934',
+      'imagePath': 'assets/Dr. V. R. N. Vijay Kumar.jpg',
+    },
+    {
+      'name': 'Dr Bhavesh Parekh',
+      'specialization': 'Medical Oncologist',
+      'experience': '20+ Years',
+      'hospital': 'HCG Aastha Cancer Hospital',
+      'location': 'Sola, Ahmedabad, Gujarat',
+      'address': 'Opp. Bhagwat Vidyapith, Sola, Ahmedabad - 380060',
+      'phone': '+91 80653 41327',
+      'imagePath': 'assets/Dr. Bhavesh Parekh.jpg',
+    },
+    {
+      'name': 'Dr Anand Shah',
+      'specialization': 'Surgical Oncologist\nSkin Cancer',
+      'experience': '8+ Years',
+      'hospital': 'Anand Onco Care',
+      'location': 'Surat, Gujarat',
+      'address':
+          '206, Accron Trade Center, Civil Char Rasta, Ring Road, Khatodra Wadi, Surat - 395002',
+      'phone': '+91 88494 75805',
+      'imagePath': 'assets/Dr. Anand Shah.jpg',
+    },
+    {
+      'name': 'Dr Bhargav Trivedi',
+      'specialization': 'Surgical Oncologist',
+      'experience': '15+ Years',
+      'hospital': 'Cancer Care Centre',
+      'location': 'Jamnagar, Gujarat',
+      'address':
+          '302, Adeshwer Plaza, Near Maruti Restaurant, Digvijay Plot, Jamnagar - 361005',
+      'phone': '+91 74900 37365',
+      'imagePath': 'assets/Dr. Bhargav Trivedi.jpg',
+    },
+    {
+      'name': 'Dr Dipayan Nandy',
+      'specialization': 'Medical Oncologist',
+      'experience': '11+ Years (17 years overall)',
+      'hospital': 'The Cancer Clinic',
+      'location': 'Vadodara, Gujarat',
+      'address':
+          '415-417, Gangotri Icon, Opp. Gokul Party Plot, Gotri Vasna Road, Vadodara - 390007',
+      'phone': '+91 87996 70646',
+      'imagePath': 'assets/Dr. dipayan nandy.jpg',
+    },
+    {
+      'name': 'Dr Jignesh Shah',
+      'specialization': 'Surgical Oncologist',
+      'experience': '20+ Years',
+      'hospital': 'The Gujarat Cancer and Research Institute (GCRI)',
+      'location': 'Asarwa, Ahmedabad, Gujarat',
+      'address': 'Civil Hospital Campus, Asarwa, Ahmedabad - 380016',
+      'phone': '+91 79 2268 8000',
+      'imagePath': 'assets/Dr. jignesh shah.jpg',
+    },
+    {
+      'name': 'Dr Akash Shah',
+      'specialization': 'Medical Oncologist',
+      'experience': '14+ Years',
+      'hospital': 'Apollo Hospital',
+      'location': 'Bhat, Gandhinagar, Gujarat',
+      'address':
+          'Plot No. 1A, Bhat GIDC Industrial Estate, Gandhinagar - 382428',
+      'phone': '+91 79 6673 6673',
+      'imagePath': 'assets/Dr. Akash Shah.jpg',
+    },
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Filter doctors based on current search input
+    final filteredDoctors = _allDoctors.where((doctor) {
+      final query = _searchQuery.toLowerCase();
+      return doctor['name']!.toLowerCase().contains(query) ||
+          doctor['specialization']!.toLowerCase().contains(query) ||
+          doctor['hospital']!.toLowerCase().contains(query) ||
+          doctor['location']!.toLowerCase().contains(query) ||
+          doctor['experience']!.toLowerCase().contains(query);
+    }).toList();
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -145,12 +258,19 @@ class SkinCancerDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
               decoration: InputDecoration(
                 hintText: "Search Doctor",
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Theme.of(context).cardColor,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
@@ -171,77 +291,20 @@ class SkinCancerDetailsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            doctorCard(
-              context,
-              doctorName: "Dr Viral Patel",
-              specialization: "Gynecologic Oncologist\nUterine, Ovarian & Cervical Cancer",
-              hospital: "HCG Aastha Cancer Centre",
-              location: "Sola, Ahmedabad",
-              address: "Bhagwat Vidyapith Road, Opp. Bhagwat Vidyapith Gate, Sola, Ahmedabad - 380060",
-              phone: "+91 77365 24011",
-            ),
-            doctorCard(
-              context,
-              doctorName: "Dr Swati Shah",
-              specialization: "Gynecologic Oncologist\nRobotic Cancer Surgeon",
-              hospital: "Shahs Cancer & Robotic Surgery Centre",
-              location: "Gota, Ahmedabad",
-              address: "SF-203 Olive Greens, SG Highway, Gota, Ahmedabad - 382481",
-              phone: "+91 89800 20898",
-            ),
-            doctorCard(
-              context,
-              doctorName: "Dr Mona Naman Shah",
-              specialization: "Gynecologic Oncosurgeon\nRobotic Surgeon",
-              hospital: "Zydus Cancer Centre",
-              location: "Thaltej, Ahmedabad",
-              address: "Zydus Hospital Road, Thaltej, Ahmedabad - 380054",
-              phone: "+91 98795 05063",
-            ),
-            doctorCard(
-              context,
-              doctorName: "Dr Nishtha Tripathi Patel",
-              specialization: "Gynecologic Oncologist\nUterine, Ovarian & Cervical Cancer",
-              hospital: "Sterling Hospital",
-              location: "Ahmedabad",
-              address: "Sterling Hospital, Sindhu Bhavan Road, Ahmedabad",
-              phone: "+91 76988 00333",
-            ),
-            doctorCard(
-              context,
-              doctorName: "Dr Ankit Shah",
-              specialization: "Gynecological Cancer Surgeon\nSurgical Oncologist",
-              hospital: "Shastriji Maharaj Hospital",
-              location: "Atladara, Vadodara",
-              address: "Hospital Circle, Narayanwadi, Atladara, Vadodara - 390007",
-              phone: "+91 97714 15510",
-            ),
-            doctorCard(
-              context,
-              doctorName: "Dr Viral Patel",
-              specialization: "Gynecologic Oncologist",
-              hospital: "Synergy Superspeciality Hospital",
-              location: "Rajkot",
-              address: "150 Feet Ring Road, Rajkot - 360005",
-              phone: "+91 77365 24011",
-            ),
-            doctorCard(
-              context,
-              doctorName: "Dr Amit Gupta",
-              specialization: "Surgical Oncologist\nGynecologic & Uterine Cancer Surgery",
-              hospital: "Surat Oncology Centre",
-              location: "Surat",
-              address: "Zenon Building, Khatodra Wadi, Surat - 395002",
-              phone: "+91 97372 67579",
-            ),
-            doctorCard(
-              context,
-              doctorName: "Dr Jignesh Shah",
-              specialization: "Gynecologic Oncology\nUterine, Ovarian & Cervical Cancer",
-              hospital: "GCRI",
-              location: "Asarwa, Ahmedabad",
-              address: "Civil Hospital Campus, Asarwa, Ahmedabad - 380016",
-              phone: "+91 79 2268 8000",
+
+            // Filtered Doctor List
+            ...filteredDoctors.map(
+              (doctor) => doctorCard(
+                context,
+                doctorName: doctor['name']!,
+                specialization: doctor['specialization']!,
+                experience: doctor['experience']!,
+                hospital: doctor['hospital']!,
+                location: doctor['location']!,
+                address: doctor['address']!,
+                phone: doctor['phone']!,
+                imagePath: doctor['imagePath'],
+              ),
             ),
           ],
         ),
@@ -255,20 +318,24 @@ class SkinCancerDetailsPage extends StatelessWidget {
       backgroundColor: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
+        side: BorderSide(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+        ),
       ),
     );
   }
 
   Widget doctorCard(
-      BuildContext context, {
-        required String doctorName,
-        required String specialization,
-        required String hospital,
-        required String location,
-        required String address,
-        required String phone,
-      }) {
+    BuildContext context, {
+    required String doctorName,
+    required String specialization,
+    required String experience,
+    required String hospital,
+    required String location,
+    required String address,
+    required String phone,
+    String? imagePath,
+  }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -289,8 +356,15 @@ class SkinCancerDetailsPage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: isDark ? Colors.grey[800] : const Color(0xFFECEFF1),
-                    child: Icon(Icons.person, size: 32, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                    backgroundColor:
+                        isDark ? Colors.grey[800] : const Color(0xFFECEFF1),
+                    foregroundImage:
+                        imagePath != null ? AssetImage(imagePath) : null,
+                    child: Icon(
+                      Icons.person,
+                      size: 32,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -309,8 +383,30 @@ class SkinCancerDetailsPage extends StatelessWidget {
                           specialization,
                           style: TextStyle(
                             fontSize: 13,
-                            color: theme.textTheme.bodySmall?.color ?? Colors.grey[600],
+                            color: theme.textTheme.bodySmall?.color ??
+                                Colors.grey[600],
                           ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.work_history_outlined,
+                              size: 14,
+                              color: Color(0xFF9A95E8),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                "$experience Experience",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF9A95E8),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -320,7 +416,11 @@ class SkinCancerDetailsPage extends StatelessWidget {
               const Divider(height: 24),
               Row(
                 children: [
-                  Icon(Icons.local_hospital, size: 16, color: theme.iconTheme.color?.withValues(alpha: 0.6)),
+                  Icon(
+                    Icons.local_hospital,
+                    size: 16,
+                    color: theme.iconTheme.color?.withValues(alpha: 0.6),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -337,7 +437,11 @@ class SkinCancerDetailsPage extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.location_on, size: 16, color: theme.iconTheme.color?.withValues(alpha: 0.6)),
+                  Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: theme.iconTheme.color?.withValues(alpha: 0.6),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
