@@ -15,12 +15,14 @@ class LungCancerCard extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => Scaffold(
                 appBar: AppBar(
-                  title: const Text("LUNG CANCER DETAILS",
+                  title: const Text(
+                    "LUNG CANCER DETAILS",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                    ),),
-                  backgroundColor: Color.fromARGB(255, 156, 153, 227),
+                    ),
+                  ),
+                  backgroundColor: const Color.fromARGB(255, 156, 153, 227),
                   foregroundColor: Colors.white,
                 ),
                 body: const LungCancerDetailsPage(),
@@ -54,10 +56,21 @@ class LungCancerCard extends StatelessWidget {
               Positioned(
                 right: -10,
                 bottom: -10,
-                child: Icon(
-                  Icons.air,
-                  size: 120,
-                  color: Colors.white.withValues(alpha: 0.15),
+                child: Opacity(
+                  opacity: 0.15,
+                  child: Image.asset(
+                    'assets/images/lung_icon.png', // <-- REPLACE WITH YOUR ASSET IMAGE PATH
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.air,
+                        size: 120,
+                        color: Colors.white,
+                      );
+                    },
+                  ),
                 ),
               ),
               Padding(
@@ -84,9 +97,13 @@ class LungCancerCard extends StatelessWidget {
                     const Spacer(),
                     Row(
                       children: [
-                        const Icon(
-                          Icons.smart_toy,
-                          color: Colors.white,
+                        Image.asset(
+                          'assets/images/ai_bot.png', // <-- REPLACE WITH YOUR ASSET IMAGE PATH
+                          width: 24,
+                          height: 24,
+                          color: Colors.white, // Applies tint color if needed
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.smart_toy, color: Colors.white),
                         ),
                         const SizedBox(width: 8),
                         const Text(
@@ -122,11 +139,122 @@ class LungCancerCard extends StatelessWidget {
     );
   }
 }
-class LungCancerDetailsPage extends StatelessWidget {
+
+class LungCancerDetailsPage extends StatefulWidget {
   const LungCancerDetailsPage({super.key});
 
   @override
+  State<LungCancerDetailsPage> createState() => _LungCancerDetailsPageState();
+}
+
+class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  // Added 'image' field for doctor profiles
+  final List<Map<String, String>> _allDoctors = [
+    {
+      'name': 'Dr Abhishek Jain',
+      'specialization':
+          'Breast and Thoracic Oncosurgeon\nLung Cancer Specialist',
+      'experience': '15+ Years',
+      'hospital': 'Marengo CIMS Hospital',
+      'location': 'Sola Ahmedabad Gujarat',
+      'address':
+          'Plot Number 67/1 Off Science City Road Opposite Panchamrut Bunglows Sola Ahmedabad Gujarat 380060',
+      'phone': '+91 79 3010 1257',
+      'image': 'assets/Lung_Cancer/Dr. Abhishek Jain.jpg',
+    },
+    {
+      'name': 'Dr Kshitij Domadia',
+      'specialization': 'Medical Oncologist\nLung Cancer Head and Neck Cancer',
+      'experience': '10+ Years',
+      'hospital': 'HCG Aastha Cancer Centre',
+      'location': 'Sola Ahmedabad Gujarat',
+      'address': 'Near Bhagwat Vidyapith Sola Ahmedabad Gujarat 380060',
+      'phone': '+91 81605 07838',
+      'image': 'assets/Lung_Cancer/Dr. Kshitji Domadia.jpg',
+    },
+    {
+      'name': 'Dr Rushabh Kothari',
+      'specialization': 'Medical Oncologist\nLung Cancer',
+      'experience': '8+ Years',
+      'hospital': 'Oncowin Cancer Center',
+      'location': 'Ahmedabad Gujarat',
+      'address': 'Ahmedabad Gujarat',
+      'phone': 'Contact Hospital',
+      'image': 'assets/Lung_Cancer/Dr. Rushabh Kothari.jpeg',
+    },
+    {
+      'name': 'Dr Palak Bhatt',
+      'specialization': 'Medical Oncologist\nLung and Breast Cancer',
+      'experience': '8+ Years',
+      'hospital': 'Oncowin Cancer Center',
+      'location': 'Ahmedabad Gujarat',
+      'address': 'Ahmedabad Gujarat',
+      'phone': 'Contact Hospital',
+      'image': 'assets/Lung_Cancer/Dr. Palak Bhatt.jpg',
+    },
+    {
+      'name': 'Dr Sarav Shah',
+      'specialization': 'Surgical Oncologist\nThoracic and Lung Cancer',
+      'experience': '12+ Years',
+      'hospital': 'Marengo CIMS Hospital',
+      'location': 'Science City Ahmedabad Gujarat',
+      'address':
+          'Basement OPD 14 West Building Science City Road Sola Ahmedabad Gujarat',
+      'phone': '+91 95868 77277',
+      'image': 'assets/Lung_Cancer/Dr. Sarav Shah.jpg',
+    },
+    {
+      'name': 'Dr Honey Parekh',
+      'specialization': 'Medical Oncologist\nLung Breast and Blood Cancer',
+      'experience': '10+ Years',
+      'hospital': 'V Care Hospital',
+      'location': 'Surat Gujarat',
+      'address': '501 V Care Hospital The Commercial Hub Surat Gujarat 395001',
+      'phone': '+91 90164 46014',
+      'image': 'assets/Lung_Cancer/Dr. Honey Parekh.jpg',
+    },
+    {
+      'name': 'Dr Amit Gupta',
+      'specialization': 'Surgical Oncologist\nLung Head and Neck Cancer',
+      'experience': '15+ Years',
+      'hospital': 'Cancer Care Surat',
+      'location': 'Ring Road Surat Gujarat',
+      'address': '4th Floor Zenon Building Ring Road Surat Gujarat 395002',
+      'phone': '+91 87800 42486',
+      'image': 'assets/Lung_Cancer/Dr. Amit Gupta.jpg',
+    },
+    {
+      'name': 'Dr Shashank Pandya',
+      'specialization': 'Surgical Oncologist\nThoracic and Lung Cancer',
+      'experience': '18+ Years',
+      'hospital': 'The Gujarat Cancer and Research Institute',
+      'location': 'Asarwa Ahmedabad Gujarat',
+      'address': 'Civil Hospital Campus Asarwa Ahmedabad Gujarat 380016',
+      'phone': '+91 79 2268 8000',
+      'image': 'assets/Lung_Cancer/Dr. Shashank Pandya.jpg',
+    },
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final filteredDoctors = _allDoctors.where((doctor) {
+      final query = _searchQuery.toLowerCase();
+      return doctor['name']!.toLowerCase().contains(query) ||
+          doctor['specialization']!.toLowerCase().contains(query) ||
+          doctor['hospital']!.toLowerCase().contains(query) ||
+          doctor['location']!.toLowerCase().contains(query) ||
+          doctor['experience']!.toLowerCase().contains(query);
+    }).toList();
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -134,7 +262,7 @@ class LungCancerDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Find a lung Cancer Specialist",
+              "Find a Lung Cancer Specialist",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -142,12 +270,19 @@ class LungCancerDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
               decoration: InputDecoration(
                 hintText: "Search Doctor",
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Theme.of(context).cardColor,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
@@ -168,98 +303,18 @@ class LungCancerDetailsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            doctorCard(
-              context,
-              doctorName: "Dr Abhishek Jain",
-              specialization:
-              "Breast and Thoracic Oncosurgeon\nLung Cancer Specialist",
-              hospital: "Marengo CIMS Hospital",
-              location: "Sola Ahmedabad Gujarat",
-              address:
-              "Plot Number 67/1 Off Science City Road Opposite Panchamrut Bunglows Sola Ahmedabad Gujarat 380060",
-              phone: "+91 79 3010 1257",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Kshitij Domadia",
-              specialization:
-              "Medical Oncologist\nLung Cancer Head and Neck Cancer",
-              hospital: "HCG Aastha Cancer Centre",
-              location: "Sola Ahmedabad Gujarat",
-              address:
-              "Near Bhagwat Vidyapith Sola Ahmedabad Gujarat 380060",
-              phone: "+91 81605 07838",
-            ),
-
-            doctorCard(
-              context,
-
-              doctorName: "Dr Rushabh Kothari",
-              specialization: "Medical Oncologist\nLung Cancer",
-              hospital: "Oncowin Cancer Center",
-              location: "Ahmedabad Gujarat",
-              address: "Ahmedabad Gujarat",
-              phone: "Contact Hospital",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Palak Bhatt",
-              specialization:
-              "Medical Oncologist\nLung and Breast Cancer",
-              hospital: "Oncowin Cancer Center",
-              location: "Ahmedabad Gujarat",
-              address: "Ahmedabad Gujarat",
-              phone: "Contact Hospital",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Sarav Shah",
-              specialization:
-              "Surgical Oncologist\nThoracic and Lung Cancer",
-              hospital: "Marengo CIMS Hospital",
-              location: "Science City Ahmedabad Gujarat",
-              address:
-              "Basement OPD 14 West Building Science City Road Sola Ahmedabad Gujarat",
-              phone: "+91 95868 77277",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Honey Parekh",
-              specialization:
-              "Medical Oncologist\nLung Breast and Blood Cancer",
-              hospital: "V Care Hospital",
-              location: "Surat Gujarat",
-              address:
-              "501 V Care Hospital The Commercial Hub Surat Gujarat 395001",
-              phone: "+91 90164 46014",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Amit Gupta",
-              specialization:
-              "Surgical Oncologist\nLung Head and Neck Cancer",
-              hospital: "Cancer Care Surat",
-              location: "Ring Road Surat Gujarat",
-              address:
-              "4th Floor Zenon Building Ring Road Surat Gujarat 395002",
-              phone: "+91 87800 42486",
-            ),
-
-            doctorCard(
-              context,
-              doctorName: "Dr Shashank Pandya",
-              specialization:
-              "Surgical Oncologist\nThoracic and Lung Cancer",
-              hospital: "The Gujarat Cancer and Research Institute",
-              location: "Asarwa Ahmedabad Gujarat",
-              address:
-              "Civil Hospital Campus Asarwa Ahmedabad Gujarat 380016",
-              phone: "+91 79 2268 8000",
+            ...filteredDoctors.map(
+              (doctor) => doctorCard(
+                context,
+                doctorName: doctor['name']!,
+                specialization: doctor['specialization']!,
+                experience: doctor['experience']!,
+                hospital: doctor['hospital']!,
+                location: doctor['location']!,
+                address: doctor['address']!,
+                phone: doctor['phone']!,
+                imagePath: doctor['image'] ?? '',
+              ),
             ),
           ],
         ),
@@ -273,20 +328,23 @@ class LungCancerDetailsPage extends StatelessWidget {
       backgroundColor: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
+        side:
+            BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.2)),
       ),
     );
   }
 
   Widget doctorCard(
-      BuildContext context, {
-        required String doctorName,
-        required String specialization,
-        required String hospital,
-        required String location,
-        required String address,
-        required String phone,
-      }) {
+    BuildContext context, {
+    required String doctorName,
+    required String specialization,
+    required String experience,
+    required String hospital,
+    required String location,
+    required String address,
+    required String phone,
+    String imagePath = '',
+  }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -305,10 +363,35 @@ class LungCancerDetailsPage extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 3. REPLACED PROFILE ICON WITH CIRCULAR DOCTOR IMAGE
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: isDark ? Colors.grey[800] : const Color(0xFFECEFF1),
-                    child: Icon(Icons.person, size: 32, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                    backgroundColor:
+                        isDark ? Colors.grey[800] : const Color(0xFFECEFF1),
+                    child: ClipOval(
+                      child: imagePath.isNotEmpty
+                          ? Image.asset(
+                              imagePath,
+                              width: 56,
+                              height: 56,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.person,
+                                  size: 32,
+                                  color: isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600],
+                                );
+                              },
+                            )
+                          : Icon(
+                              Icons.person,
+                              size: 32,
+                              color:
+                                  isDark ? Colors.grey[400] : Colors.grey[600],
+                            ),
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -327,8 +410,30 @@ class LungCancerDetailsPage extends StatelessWidget {
                           specialization,
                           style: TextStyle(
                             fontSize: 13,
-                            color: theme.textTheme.bodySmall?.color ?? Colors.grey[600],
+                            color: theme.textTheme.bodySmall?.color ??
+                                Colors.grey[600],
                           ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.work_history_outlined,
+                              size: 14,
+                              color: Color(0xFF9A95E8),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                "$experience Experience",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF9A95E8),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -338,7 +443,8 @@ class LungCancerDetailsPage extends StatelessWidget {
               const Divider(height: 24),
               Row(
                 children: [
-                  Icon(Icons.local_hospital, size: 16, color: theme.iconTheme.color?.withValues(alpha: 0.6)),
+                  Icon(Icons.local_hospital,
+                      size: 16, color: theme.iconTheme.color?.withOpacity(0.6)),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -355,7 +461,8 @@ class LungCancerDetailsPage extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.location_on, size: 16, color: theme.iconTheme.color?.withValues(alpha: 0.6)),
+                  Icon(Icons.location_on,
+                      size: 16, color: theme.iconTheme.color?.withOpacity(0.6)),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
