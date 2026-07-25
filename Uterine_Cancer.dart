@@ -56,10 +56,22 @@ class UterineCancerCard extends StatelessWidget {
               Positioned(
                 right: -10,
                 bottom: -10,
-                child: Icon(
-                  Icons.air,
-                  size: 120,
-                  color: Colors.white.withValues(alpha: 0.15),
+                child: Opacity(
+                  opacity: 0.15,
+                  child: Image.asset(
+                    'assets/images/uterine_icon.png', // Replace with your image asset path
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback icon if image asset is missing
+                      return const Icon(
+                        Icons.air,
+                        size: 120,
+                        color: Colors.white,
+                      );
+                    },
+                  ),
                 ),
               ),
               Padding(
@@ -86,9 +98,13 @@ class UterineCancerCard extends StatelessWidget {
                     const Spacer(),
                     Row(
                       children: [
-                        const Icon(
-                          Icons.smart_toy,
-                          color: Colors.white,
+                        Image.asset(
+                          'assets/images/ai_bot.png', // Replace with your image asset path
+                          width: 24,
+                          height: 24,
+                          color: Colors.white, // Color filter tint
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.smart_toy, color: Colors.white),
                         ),
                         const SizedBox(width: 8),
                         const Text(
@@ -129,31 +145,38 @@ class UterineCancerDetailsPage extends StatefulWidget {
   const UterineCancerDetailsPage({super.key});
 
   @override
-  State<UterineCancerDetailsPage> createState() => _UterineCancerDetailsPageState();
+  State<UterineCancerDetailsPage> createState() =>
+      _UterineCancerDetailsPageState();
 }
 
 class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
+  // Added 'image' field for doctor profiles
   final List<Map<String, String>> _allDoctors = [
     {
       'name': 'Dr Viral Patel',
-      'specialization': 'Gynecologic Oncologist\nUterine, Ovarian & Cervical Cancer',
+      'specialization':
+          'Gynecologic Oncologist\nUterine, Ovarian & Cervical Cancer',
       'experience': '10–12+ Years',
       'hospital': 'HCG Aastha Cancer Centre',
       'location': 'Sola, Ahmedabad, Gujarat',
-      'address': 'Bhagwat Vidyapith Road, Opp. Bhagwat Vidyapith Gate, Sola, Ahmedabad - 380060',
+      'address':
+          'Bhagwat Vidyapith Road, Opp. Bhagwat Vidyapith Gate, Sola, Ahmedabad - 380060',
       'phone': '+91 77365 24011',
+      'image': 'assets/Uterine_Cancer/Dr. Viral Patel HCG.jpg',
     },
     {
       'name': 'Dr Swati Shah',
-      'specialization': 'Gynecologic Oncologist\nRobotic Cancer Surgeon\nUterus, Ovary & Cervix Cancer',
+      'specialization':
+          'Gynecologic Oncologist\nRobotic Cancer Surgeon\nUterus, Ovary & Cervix Cancer',
       'experience': '10+ Years',
       'hospital': 'Shahs Cancer & Robotic Surgery Centre',
       'location': 'Gota, Ahmedabad, Gujarat',
       'address': 'SF-203 Olive Greens, SG Highway, Gota, Ahmedabad - 382481',
       'phone': '+91 89800 20898',
+      'image': 'assets/Uterine_Cancer/Dr. Swati Shah.jpg',
     },
     {
       'name': 'Dr Mona Naman Shah',
@@ -163,15 +186,18 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
       'location': 'Thaltej, Ahmedabad, Gujarat',
       'address': 'Zydus Hospital Road, Thaltej, Ahmedabad - 380054',
       'phone': '+91 98795 05063',
+      'image': 'assets/Uterine_Cancer/Dr. Mona Naman Shah.jpg',
     },
     {
       'name': 'Dr Nishtha Tripathi Patel',
-      'specialization': 'Gynecologic Oncologist\nUterine, Ovarian & Cervical Cancer',
+      'specialization':
+          'Gynecologic Oncologist\nUterine, Ovarian & Cervical Cancer',
       'experience': '12+ Years',
       'hospital': 'Sterling Hospital',
       'location': 'Ahmedabad, Gujarat',
       'address': 'Sterling Hospital, Sindhu Bhavan Road, Ahmedabad',
       'phone': '+91 76988 00333',
+      'image': 'assets/Uterine_Cancer/Dr. Nishtha Tripathi Patel.jpg',
     },
     {
       'name': 'Dr Ankit Shah',
@@ -179,8 +205,10 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
       'experience': 'Not publicly available',
       'hospital': 'Shastriji Maharaj Hospital',
       'location': 'Atladara, Vadodara, Gujarat',
-      'address': 'Shastriji Maharaj Hospital Circle, Narayanwadi, Atladara, Vadodara - 390007',
+      'address':
+          'Shastriji Maharaj Hospital Circle, Narayanwadi, Atladara, Vadodara - 390007',
       'phone': '+91 97714 15510',
+      'image': 'assets/Uterine_Cancer/Dr. Ankit Shah.jpg',
     },
     {
       'name': 'Dr Viral Patel',
@@ -188,26 +216,33 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
       'experience': '10–12+ Years',
       'hospital': 'Synergy Superspeciality Hospital',
       'location': 'Rajkot, Gujarat',
-      'address': 'Synergy Circle, 150 Feet Ring Road, Opp. Gokul Mathura Apartment, Rajkot - 360005',
+      'address':
+          'Synergy Circle, 150 Feet Ring Road, Opp. Gokul Mathura Apartment, Rajkot - 360005',
       'phone': '+91 77365 24011',
+      'image': 'assets/Uterine_Cancer/Dr. Viral Patel Rajkot.jpg',
     },
     {
       'name': 'Dr Amit Gupta',
-      'specialization': 'Surgical Oncologist\nGynecologic & Uterine Cancer Surgery',
+      'specialization':
+          'Surgical Oncologist\nGynecologic & Uterine Cancer Surgery',
       'experience': 'Not publicly available',
       'hospital': 'Surat Oncology Centre',
       'location': 'Surat, Gujarat',
-      'address': 'Second Floor, Zenon Building, Opp. Unique Hospital, Near Kiran Motors, Khatodra Wadi, Surat - 395002',
+      'address':
+          'Second Floor, Zenon Building, Opp. Unique Hospital, Near Kiran Motors, Khatodra Wadi, Surat - 395002',
       'phone': '+91 97372 67579',
+      'image': 'assets/Uterine_Cancer/Dr. Amit Gupta Surat.jpg',
     },
     {
       'name': 'Dr Jignesh Shah',
-      'specialization': 'Gynecologic Oncology\nUterine, Ovarian & Cervical Cancer',
+      'specialization':
+          'Gynecologic Oncology\nUterine, Ovarian & Cervical Cancer',
       'experience': 'Not publicly available',
       'hospital': 'The Gujarat Cancer & Research Institute (GCRI)',
       'location': 'Asarwa, Ahmedabad, Gujarat',
       'address': 'Civil Hospital Campus, Haripura, Asarwa, Ahmedabad - 380016',
       'phone': '+91 79 2268 8000',
+      'image': 'assets/Uterine_Cancer/Dr. Jignesh Shah Civil.jpg',
     },
   ];
 
@@ -219,7 +254,6 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Filter doctors list based on search query
     final filteredDoctors = _allDoctors.where((doctor) {
       final query = _searchQuery.toLowerCase();
       return doctor['name']!.toLowerCase().contains(query) ||
@@ -255,7 +289,8 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Theme.of(context).cardColor,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
@@ -277,7 +312,7 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
             ),
             const SizedBox(height: 20),
             ...filteredDoctors.map(
-                  (doctor) => doctorCard(
+              (doctor) => doctorCard(
                 context,
                 doctorName: doctor['name']!,
                 specialization: doctor['specialization']!,
@@ -286,6 +321,7 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
                 location: doctor['location']!,
                 address: doctor['address']!,
                 phone: doctor['phone']!,
+                imagePath: doctor['image'] ?? '',
               ),
             ),
           ],
@@ -300,21 +336,23 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
       backgroundColor: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
+        side: BorderSide(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
       ),
     );
   }
 
   Widget doctorCard(
-      BuildContext context, {
-        required String doctorName,
-        required String specialization,
-        required String experience,
-        required String hospital,
-        required String location,
-        required String address,
-        required String phone,
-      }) {
+    BuildContext context, {
+    required String doctorName,
+    required String specialization,
+    required String experience,
+    required String hospital,
+    required String location,
+    required String address,
+    required String phone,
+    String imagePath = '',
+  }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -339,8 +377,32 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: isDark ? Colors.grey[800] : const Color(0xFFECEFF1),
-                    child: Icon(Icons.person, size: 32, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                    backgroundColor:
+                        isDark ? Colors.grey[800] : const Color(0xFFECEFF1),
+                    child: ClipOval(
+                      child: imagePath.isNotEmpty
+                          ? Image.asset(
+                              imagePath,
+                              width: 56,
+                              height: 56,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.person,
+                                  size: 32,
+                                  color: isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600],
+                                );
+                              },
+                            )
+                          : Icon(
+                              Icons.person,
+                              size: 32,
+                              color:
+                                  isDark ? Colors.grey[400] : Colors.grey[600],
+                            ),
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -359,7 +421,8 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
                           specialization,
                           style: TextStyle(
                             fontSize: 13,
-                            color: theme.textTheme.bodySmall?.color ?? Colors.grey[600],
+                            color: theme.textTheme.bodySmall?.color ??
+                                Colors.grey[600],
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -391,7 +454,9 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
               const Divider(height: 24),
               Row(
                 children: [
-                  Icon(Icons.local_hospital, size: 16, color: theme.iconTheme.color?.withValues(alpha: 0.6)),
+                  Icon(Icons.local_hospital,
+                      size: 16,
+                      color: theme.iconTheme.color?.withValues(alpha: 0.6)),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -408,7 +473,9 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.location_on, size: 16, color: theme.iconTheme.color?.withValues(alpha: 0.6)),
+                  Icon(Icons.location_on,
+                      size: 16,
+                      color: theme.iconTheme.color?.withValues(alpha: 0.6)),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
