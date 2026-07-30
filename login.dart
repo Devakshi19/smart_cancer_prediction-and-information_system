@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:project/api_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project/main.dart';
 import 'signup.dart';
 import 'user_session.dart';
@@ -31,34 +31,40 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
     });
 
-    final result = await ApiService.login(email, password);
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
 
-    if (!mounted) return;
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (result['success'] == true) {
-      final userData = result['user'];
+      final user = userCredential.user;
+      final userName = (user?.displayName != null && user!.displayName!.isNotEmpty)
+          ? user.displayName!
+          : 'User';
       await UserSession.saveUser(
-        name: userData['username'] ?? 'User',
-        email: userData['email'] ?? email,
+        name: userName,
+        email: user?.email ?? email,
       );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'] ?? "Login Successful")),
+        const SnackBar(content: Text("Login Successful")),
       );
 
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const HomePage()),
-        (route) => false,
+            (route) => false,
       );
-    } else {
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'] ?? "Login Failed")),
+        SnackBar(content: Text(e.message ?? "Login Failed")),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -73,11 +79,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("LOGIN",
-        style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        ),),
+        title: const Text(
+          "LOGIN",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: const Color(0xFF9A95E8),
         foregroundColor: Colors.white,
       ),
@@ -117,19 +125,24 @@ class _LoginPageState extends State<LoginPage> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF9A95E8),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 onPressed: _isLoading ? null : _handleLogin,
                 child: _isLoading
                     ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2),
-                      )
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                      color: Colors.white, strokeWidth: 2),
+                )
                     : const Text(
-                        "LOGIN",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                  "LOGIN",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 15),
