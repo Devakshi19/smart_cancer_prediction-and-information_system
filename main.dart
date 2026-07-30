@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:project/screens/settings_page.dart';
-import 'package:project/screens/user_session.dart';
 import 'screens.dart';
 import 'widgets.dart';
+
+
 class ThemeManager extends ChangeNotifier {
   static ThemeManager? _instance;
   ThemeManager._();
@@ -46,6 +47,7 @@ class AppState {
   static void setLanguage(String lang) {
     languageNotifier.value = lang;
   }
+
   static final Map<String, Map<String, String>> _localizedValues = {
     'English': {
       'app_title': 'CANCER DETECTION APP',
@@ -56,12 +58,13 @@ class AppState {
       'help': 'Help & Feedback',
       'terms': 'Terms & Conditions',
       'settings': 'Settings',
+      'about_developer': 'About Developer',
       'logout': 'Log Out',
       'home': 'HOME',
-      'reports': 'REPORTS',
+      'history': 'HISTORY',
       'scan_now': 'SCAN NOW',
       'chatbot': 'CHATBOT',
-      'doctors': 'DOCTORS',
+      'contact_us': 'CONTACT US',
     },
     'Hindi': {
       'app_title': 'कैंसर पता लगाने वाला ऐप',
@@ -72,12 +75,13 @@ class AppState {
       'help': 'सहायता और प्रतिक्रिया',
       'terms': 'नियम और शर्तें',
       'settings': 'सेटिंग्स',
+      'about_developer': 'डेवलपर के बारे में',
       'logout': 'लॉग आउट',
       'home': 'होम',
-      'reports': 'रिपोर्ट्स',
+      'history': 'इतिहास',
       'scan_now': 'स्कैन करें',
       'chatbot': 'चैटबॉट',
-      'doctors': 'डॉक्टर्स',
+      'contact_us': 'संपर्क करें',
     },
     'Gujarati': {
       'app_title': 'કેન્સર ડિટેક્શન એપ',
@@ -88,12 +92,13 @@ class AppState {
       'help': 'મદદ અને પ્રતિસાદ',
       'terms': 'નિયમો અને શરતો',
       'settings': 'સેટિંગ્સ',
+      'about_developer': 'ડેવલપર વિશે',
       'logout': 'લોગ આઉટ',
       'home': 'હોમ',
-      'reports': 'રિપોર્ટ્સ',
+      'history': 'ઇતિહાસ',
       'scan_now': 'સ્કેન કરો',
       'chatbot': 'ચેટબોટ',
-      'doctors': 'ડૉક્ટર્સ',
+      'contact_us': 'સંપર્ક કરો',
     },
   };
 
@@ -107,6 +112,23 @@ class AppState {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyBUn8czg17vM8Jp4elyJdus10vs5TX9Ky0",
+        authDomain: "cancer-detection-app-4a51a.firebaseapp.com",
+        projectId: "cancer-detection-app-4a51a",
+        storageBucket: "cancer-detection-app-4a51a.firebasestorage.app",
+        messagingSenderId: "573751912810",
+        appId: "1:573751912810:web:2842a33e953e529e079d13",
+        measurementId: "G-7702EMXK8C",
+      ),
+    );
+  } catch (e) {
+    debugPrint("Firebase initialization error: $e");
+  }
+
   await AppState.init();
   runApp(const MyApp());
 }
@@ -172,6 +194,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _loadDrawerUserData();
   }
+
   Future<void> _loadDrawerUserData() async {
     final userData = await UserSession.getUser();
     setState(() {
@@ -179,6 +202,7 @@ class _HomePageState extends State<HomePage> {
       currentUserEmail = userData['email'] ?? "AI-Based Cancer Detection";
     });
   }
+
   void _showQuickScanModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -204,17 +228,15 @@ class _HomePageState extends State<HomePage> {
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
                   Navigator.pop(context);
-                  // TODO: Open Skin Cancer Detector Screen
                 },
               ),
               ListTile(
-                leading:
-                const Icon(Icons.personal_injury, color: Color(0xFF9A95E8)),
+                leading: const Icon(Icons.personal_injury,
+                    color: Color(0xFF9A95E8)),
                 title: const Text("Lung Cancer (Chest X-Ray)"),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
                   Navigator.pop(context);
-                  // TODO: Open Lung Cancer Detector Screen
                 },
               ),
               ListTile(
@@ -223,7 +245,6 @@ class _HomePageState extends State<HomePage> {
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
                   Navigator.pop(context);
-                  // TODO: Open Breast Cancer Detector Screen
                 },
               ),
             ],
@@ -281,7 +302,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: ListView(
-        children: [
+        children: const [
           SkinCancerCard(),
           LungCancerCard(),
           UterineCancerCard(),
@@ -336,7 +357,7 @@ class _HomePageState extends State<HomePage> {
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ProfilePage(userData: {},), // Removed userData parameter
+                    builder: (context) => const ProfilePage(),
                   ),
                 );
                 _loadDrawerUserData();
@@ -385,6 +406,18 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => const TermsConditionsPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.developer_mode_sharp),
+              title: Text(AppState.tr('about_developer')),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AboutDevelopersPage()),
                 );
               },
             ),
@@ -463,12 +496,12 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: const Icon(Icons.home_outlined, size: 26),
             activeIcon: const Icon(Icons.home, size: 28),
-            label: AppState.tr('HOME'),
+            label: AppState.tr('home'),
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.history_sharp, size: 26),
             activeIcon: const Icon(Icons.assignment, size: 28),
-            label: AppState.tr('HISTORY'),
+            label: AppState.tr('history'),
           ),
           BottomNavigationBarItem(
             icon: const CircleAvatar(
@@ -476,17 +509,17 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: Color(0xFF9A95E8),
               child: Icon(Icons.add_a_photo, color: Colors.white, size: 20),
             ),
-            label: AppState.tr('SCAN NOW'),
+            label: AppState.tr('scan_now'),
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.support_agent_outlined, size: 26),
             activeIcon: const Icon(Icons.support_agent, size: 28),
-            label: AppState.tr('CHATBOAT'),
+            label: AppState.tr('chatbot'),
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.perm_contact_calendar_outlined, size: 26),
             activeIcon: const Icon(Icons.medical_services, size: 28),
-            label: AppState.tr('CONTACT US'),
+            label: AppState.tr('contact_us'),
           ),
         ],
       ),
