@@ -21,7 +21,7 @@ class AboutDevelopersPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: const [
           DeveloperCard(
-            image: "assets/Devakshi.jpg",
+            image: "assets/Devuu.png",
             name: "Panchal Devakshi",
             college: "Indus University, Rancharda",
             branch: "Information Technology",
@@ -41,7 +41,7 @@ class AboutDevelopersPage extends StatelessWidget {
           ),
           SizedBox(height: 18),
           DeveloperCard(
-            image: "assets/developers/dev3.jpg",
+            image: "assets/Miral.jpg",
             name: "Prajapati Miral",
             college: "Indus University, Rancharda",
             branch: "Information Technology",
