@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:project/main.dart';
 import 'login.dart';
-import 'user_session.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -16,6 +14,11 @@ class _SignupPageState extends State<SignupPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _isValidEmail(String email) {
+    return RegExp(
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(email);
+  }
 
   void _handleSignup() async {
     final name = _nameController.text.trim();
@@ -23,9 +26,18 @@ class _SignupPageState extends State<SignupPage> {
     final password = _passwordController.text.trim();
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all fields")),
-      );
+      _showSnackBar("Please fill in all fields", Colors.redAccent);
+      return;
+    }
+
+    if (!_isValidEmail(email)) {
+      _showSnackBar("Please enter a valid email address", Colors.redAccent);
+      return;
+    }
+
+    if (password.length < 6) {
+      _showSnackBar(
+          "Password must be at least 6 characters long", Colors.redAccent);
       return;
     }
 
@@ -34,22 +46,49 @@ class _SignupPageState extends State<SignupPage> {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+
       await userCredential.user?.updateDisplayName(name);
-      await UserSession.saveUser(name: name, email: email);
+      await userCredential.user?.sendEmailVerification();
+      await FirebaseAuth.instance.signOut();
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Account Created Successfully")),
-      );
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginPage()),
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+          title: const Text("Verify Your Email"),
+          content: Text(
+            "A verification link has been sent to:\n\n$email\n\nPlease check your inbox (or spam) and click the link to verify your email before logging in.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                );
+              },
+              child: const Text("OK, GO TO LOGIN"),
+            ),
+          ],
+        ),
       );
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? "Registration Failed")),
-      );
+      // Catch specific Firebase Auth Errors
+      String errorMessage = "Registration failed.";
+      if (e.code == 'invalid-email') {
+        errorMessage = "The email address is invalid or badly formatted.";
+      } else if (e.code == 'email-already-in-use') {
+        errorMessage = "An account already exists with this email.";
+      } else if (e.code == 'weak-password') {
+        errorMessage = "The password provided is too weak.";
+      } else if (e.message != null) {
+        errorMessage = e.message!;
+      }
+      _showSnackBar(errorMessage, Colors.redAccent);
+    } catch (e) {
+      _showSnackBar("An unexpected error occurred: $e", Colors.redAccent);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -58,28 +97,31 @@ class _SignupPageState extends State<SignupPage> {
     setState(() => _isLoading = true);
     try {
       GoogleAuthProvider googleProvider = GoogleAuthProvider();
-      UserCredential userCredential =
       await FirebaseAuth.instance.signInWithPopup(googleProvider);
 
-      final user = userCredential.user;
-      await UserSession.saveUser(
-        name: user?.displayName ?? 'Google User',
-        email: user?.email ?? '',
-      );
-
       if (!mounted) return;
-      Navigator.pushAndRemoveUntil(
+      _showSnackBar("Signed up successfully with Google!", Colors.green);
+
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-            (route) => false,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
       );
+    } on FirebaseAuthException catch (e) {
+      _showSnackBar(e.message ?? "Google Sign-In Failed", Colors.redAccent);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Google Sign-In Failed: $e")),
-      );
+      _showSnackBar("Google Sign-In Error: $e", Colors.redAccent);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _showSnackBar(String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+      ),
+    );
   }
 
   @override
@@ -93,129 +135,176 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           "SIGN UP",
           style: TextStyle(
             color: Colors.white,
-            fontSize: 24,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: const Color(0xFF9A95E8),
-        foregroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
+      body: SafeArea(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           child: Column(
             children: [
+              const SizedBox(height: 10),
+              // Header Icon matching screenshot
               const Icon(
-                Icons.person_add,
-                size: 100,
+                Icons.person_add_alt_1_rounded,
+                size: 90,
                 color: Color(0xFF9A95E8),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
+
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: "Full Name",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
+                  prefixIcon: const Icon(Icons.person, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 16),
               TextField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
-                ),
                 keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  prefixIcon: const Icon(Icons.email, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 16),
               TextField(
                 controller: _passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: "Password",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
+                  prefixIcon: const Icon(Icons.lock, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
               const SizedBox(height: 25),
+
               SizedBox(
                 width: double.infinity,
+                height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF9A95E8),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 1,
                   ),
                   onPressed: _isLoading ? null : _handleSignup,
                   child: _isLoading
                       ? const SizedBox(
-                    height: 20,
-                    width: 20,
+                    height: 22,
+                    width: 22,
                     child: CircularProgressIndicator(
-                        color: Colors.white, strokeWidth: 2),
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
                   )
                       : const Text(
                     "SIGN UP",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              // OR Divider
-              const Row(
-                children: [
-                  Expanded(child: Divider(thickness: 1)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text("OR", style: TextStyle(color: Colors.grey)),
-                  ),
-                  Expanded(child: Divider(thickness: 1)),
-                ],
-              ),
-              const SizedBox(height: 20),
-              // Sign up with Google Button
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: const BorderSide(color: Color(0xFF9A95E8)),
-                  ),
-                  onPressed: _isLoading ? null : _handleGoogleSignup,
-                  icon: const Icon(Icons.g_mobiledata,
-                      size: 30, color: Color(0xFF9A95E8)),
-                  label: const Text(
-                    "Sign up with Google",
-                    style: TextStyle(
-                      color: Color(0xFF9A95E8),
+                      color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 25),
+              Row(
+                children: const [
+                  Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      "OR",
+                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                ],
+              ),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFF9A95E8), width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: _isLoading ? null : _handleGoogleSignup,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text(
+                        "G",
+                        style: TextStyle(
+                          color: Color(0xFF9A95E8),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "Continue with Google",
+                        style: TextStyle(
+                          color: Color(0xFF9A95E8),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Already have an account? "),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
+                  const Text(
+                    "Already have an account? ",
+                    style: TextStyle(color: Colors.black87),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (_) => const LoginPage()),
                       );
                     },
-                    child: const Text("Login"),
+                    child: const Text(
+                      "Login",
+                      style: TextStyle(
+                        color: Color(0xFF9A95E8),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
