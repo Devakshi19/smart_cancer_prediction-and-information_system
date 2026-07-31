@@ -45,7 +45,7 @@ class AboutDevelopersPage extends StatelessWidget {
             name: "Prajapati Miral",
             college: "Indus University, Rancharda",
             branch: "Information Technology",
-            email: "miral@gmail.com",
+            email: "miralprajapati2005@gmail.com",
             about:
                 "I am a final-year B.Tech IT student with a strong eye for visual detail. I contributed by building card views, styling medical information sections, integrating custom graphical assets, and ensuring consistent design layouts across various screen sizes.",
           ),
@@ -55,7 +55,7 @@ class AboutDevelopersPage extends StatelessWidget {
             name: "Shah Upangna",
             college: "Indus University, Rancharda",
             branch: "Information Technology",
-            email: "upangna4@gmail.com",
+            email: "upagnashah94@gmail.com",
             about:
                 "I am a final-year B.Tech IT student focused on backend logic and state management. My key contributions included structuring local specialist database schemas, writing real-time filtering algorithms for search queries, and managing data flows across application screens.",
           ),
