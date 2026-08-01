@@ -35,7 +35,7 @@ class AboutDevelopersPage extends StatelessWidget {
             name: "Patel Rachana",
             college: "Indus University, Rancharda",
             branch: "Information Technology",
-            email: "rachana@gmail.com",
+            email: "rachanait676@gmail.com",
             about:
                 "I am a final-year B.Tech IT student passionate about mobile user experience. My main focus in this project involved developing responsive screen layouts, implementing interactive search and filter bars, and standardizing application themes for light and dark modes.",
           ),
@@ -65,7 +65,7 @@ class AboutDevelopersPage extends StatelessWidget {
             name: "Trivedi Vedashree",
             college: "Indus University, Rancharda",
             branch: "Information Technology",
-            email: "vedshree@gmail.com",
+            email: "Vedashreetrivedi123@gmail.com",
             about:
                 "I am a final-year B.Tech IT student specializing in software integration and data management. I worked on back-end service integration, API communications, data validation, and handling backend logic for AI detection feature modules.",
           ),
@@ -109,7 +109,6 @@ class DeveloperCard extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  // ENHANCED HIGH-QUALITY PICTURE CONTAINER
                   Container(
                     width: 110,
                     height: 110,
@@ -135,7 +134,7 @@ class DeveloperCard extends StatelessWidget {
                         height: 110,
                         fit: BoxFit.cover,
                         filterQuality: FilterQuality
-                            .high, // Enables high-quality image filtering
+                            .high, 
                         errorBuilder: (context, error, stackTrace) =>
                             const Icon(
                           Icons.person,
