@@ -5,10 +5,7 @@ class ContactPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Detect theme mode
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    // Theme Color Palette
     const primaryAccent = Color.fromARGB(255, 156, 153, 227);
     final backgroundColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
     final cardColor = isDarkMode ? const Color(0xFF1E1E24) : Colors.white;
@@ -68,9 +65,7 @@ class ContactPage extends StatelessWidget {
                 ],
               ),
             ),
-
-            // 1. Email Tile
-            _buildContactTile(
+           _buildContactTile(
               icon: Icons.email,
               title: "Email",
               subtitle: "cancerdetection26@gmail.com",
@@ -79,9 +74,7 @@ class ContactPage extends StatelessWidget {
               subtitleColor: subtitleColor,
               iconColor: primaryAccent,
             ),
-
-            // 2. Phone Tile
-            _buildContactTile(
+           _buildContactTile(
               icon: Icons.phone,
               title: "Phone",
               subtitle: "+91 xxxxxxxxxx",
@@ -90,9 +83,7 @@ class ContactPage extends StatelessWidget {
               subtitleColor: subtitleColor,
               iconColor: primaryAccent,
             ),
-
-            // 3. Website Tile
-            _buildContactTile(
+           _buildContactTile(
               icon: Icons.language,
               title: "Website",
               subtitle: "www.cancerdetection.com",
@@ -101,9 +92,7 @@ class ContactPage extends StatelessWidget {
               subtitleColor: subtitleColor,
               iconColor: primaryAccent,
             ),
-
-            // 4. Emergency Helpline Tile
-            _buildContactTile(
+           _buildContactTile(
               icon: Icons.medical_services,
               title: "Emergency Helpline",
               subtitle: "108",
@@ -114,18 +103,14 @@ class ContactPage extends StatelessWidget {
             ),
 
             const SizedBox(height: 12),
-
-            // About Us Card
-            _buildAboutUsCard(
+           _buildAboutUsCard(
               cardColor: cardColor,
               titleColor: titleColor,
               textColor: subtitleColor,
             ),
 
             const SizedBox(height: 12),
-
-            // Developed By Card
-            _buildDevelopedByCard(
+           _buildDevelopedByCard(
               cardColor: cardColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
@@ -136,8 +121,6 @@ class ContactPage extends StatelessWidget {
       ),
     );
   }
-
-  // Helper Widget: Contact Info Tile
   Widget _buildContactTile({
     required IconData icon,
     required String title,
@@ -188,8 +171,6 @@ class ContactPage extends StatelessWidget {
       ),
     );
   }
-
-  // Helper Widget: About Us
   Widget _buildAboutUsCard({
     required Color cardColor,
     required Color titleColor,
@@ -228,8 +209,6 @@ class ContactPage extends StatelessWidget {
       ),
     );
   }
-
-  // Helper Widget: Developed By
   Widget _buildDevelopedByCard({
     required Color cardColor,
     required Color titleColor,
