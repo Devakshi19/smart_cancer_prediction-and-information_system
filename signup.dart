@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project/main.dart';
 import 'login.dart';
+import 'user_session.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -14,6 +16,7 @@ class _SignupPageState extends State<SignupPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+
   bool _isValidEmail(String email) {
     return RegExp(
         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
@@ -75,7 +78,6 @@ class _SignupPageState extends State<SignupPage> {
         ),
       );
     } on FirebaseAuthException catch (e) {
-      // Catch specific Firebase Auth Errors
       String errorMessage = "Registration failed.";
       if (e.code == 'invalid-email') {
         errorMessage = "The email address is invalid or badly formatted.";
@@ -93,19 +95,32 @@ class _SignupPageState extends State<SignupPage> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
+
   void _handleGoogleSignup() async {
     setState(() => _isLoading = true);
     try {
       GoogleAuthProvider googleProvider = GoogleAuthProvider();
+      UserCredential userCredential =
       await FirebaseAuth.instance.signInWithPopup(googleProvider);
 
-      if (!mounted) return;
-      _showSnackBar("Signed up successfully with Google!", Colors.green);
+      User? user = userCredential.user;
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-      );
+      if (user != null) {
+        await UserSession.saveUser(
+          name: user.displayName ?? "User",
+          email: user.email ?? "",
+        );
+
+        if (!mounted) return;
+        _showSnackBar("Signed up successfully with Google!", Colors.green);
+
+        // Go straight to Home Page since Google verifies email automatically
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const HomePage()),
+              (route) => false,
+        );
+      }
     } on FirebaseAuthException catch (e) {
       _showSnackBar(e.message ?? "Google Sign-In Failed", Colors.redAccent);
     } catch (e) {
@@ -158,14 +173,12 @@ class _SignupPageState extends State<SignupPage> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              // Header Icon matching screenshot
               const Icon(
                 Icons.person_add_alt_1_rounded,
                 size: 90,
                 color: Color(0xFF9A95E8),
               ),
               const SizedBox(height: 30),
-
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
@@ -201,7 +214,6 @@ class _SignupPageState extends State<SignupPage> {
                 ),
               ),
               const SizedBox(height: 25),
-
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -234,14 +246,15 @@ class _SignupPageState extends State<SignupPage> {
                 ),
               ),
               const SizedBox(height: 25),
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Expanded(child: Divider(thickness: 1, color: Colors.grey)),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
                       "OR",
-                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          color: Colors.grey, fontWeight: FontWeight.w500),
                     ),
                   ),
                   Expanded(child: Divider(thickness: 1, color: Colors.grey)),
@@ -253,15 +266,16 @@ class _SignupPageState extends State<SignupPage> {
                 height: 48,
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF9A95E8), width: 1.5),
+                    side: const BorderSide(
+                        color: Color(0xFF9A95E8), width: 1.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   onPressed: _isLoading ? null : _handleGoogleSignup,
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Text(
                         "G",
                         style: TextStyle(
