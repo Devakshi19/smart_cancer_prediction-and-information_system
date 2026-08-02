@@ -1,6 +1,15 @@
 export 'screens/About.dart';
-export 'screens/homepage.dart';
 export 'screens/login.dart';
 export 'screens/Splashscreen.dart';
 export 'screens/Help.dart';
 export 'screens/Terms&condition.dart';
+export 'screens/profilepage.dart';
+export 'screens/contactpage.dart';
+export 'screens/editprofile.dart';
+export 'screens/Aichatboat.dart';
+export 'screens/historypage.dart';
+export 'screens/signup.dart';
+export 'screens/searchpage.dart';
+export 'screens/AboutDevelopers.dart';
+export 'screens/settings_page.dart';
+export 'screens/user_session.dart';
