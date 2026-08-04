@@ -59,12 +59,11 @@ class UterineCancerCard extends StatelessWidget {
                 child: Opacity(
                   opacity: 0.15,
                   child: Image.asset(
-                    'assets/images/uterine_icon.png', // Replace with your image asset path
+                    'assets/images/uterine_icon.png',
                     width: 120,
                     height: 120,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
-                      // Fallback icon if image asset is missing
                       return const Icon(
                         Icons.air,
                         size: 120,
@@ -99,10 +98,10 @@ class UterineCancerCard extends StatelessWidget {
                     Row(
                       children: [
                         Image.asset(
-                          'assets/images/ai_bot.png', // Replace with your image asset path
+                          'assets/images/ai_bot.png',
                           width: 24,
                           height: 24,
-                          color: Colors.white, // Color filter tint
+                          color: Colors.white,
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(Icons.smart_toy, color: Colors.white),
                         ),
@@ -153,7 +152,6 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // Added 'image' field for doctor profiles
   final List<Map<String, String>> _allDoctors = [
     {
       'name': 'Dr Viral Patel',
@@ -297,19 +295,6 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  filterChip(context, "Location"),
-                  const SizedBox(width: 10),
-                  filterChip(context, "Hospital"),
-                  const SizedBox(width: 10),
-                  filterChip(context, "Specialization"),
-                ],
-              ),
-            ),
             const SizedBox(height: 20),
             ...filteredDoctors.map(
               (doctor) => doctorCard(
@@ -326,18 +311,6 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget filterChip(BuildContext context, String title) {
-    return Chip(
-      label: Text(title),
-      backgroundColor: Theme.of(context).cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
       ),
     );
   }
