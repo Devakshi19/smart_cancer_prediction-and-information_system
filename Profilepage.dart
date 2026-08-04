@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'editprofile.dart';
 import 'user_session.dart';
 
+
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final Map<String, dynamic>? userData;
+  const ProfilePage({super.key, this.userData});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -26,13 +29,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadProfileData() async {
     final userData = await UserSession.getUser();
+    final firebaseUser = FirebaseAuth.instance.currentUser;
     setState(() {
-      name = userData['name']!;
-      email = userData['email']!;
-      phone = userData['phone']!;
-      age = userData['age']!;
-      weight = userData['weight']!;
-      height = userData['height']!;
+      name = firebaseUser?.displayName ?? userData['name'] ?? "Guest User";
+      email = firebaseUser?.email ?? userData['email'] ?? "guest@example.com";
+      phone = userData['phone'] ?? "+91 XXXXX XXXXX";
+      age = userData['age'] ?? "21 Years";
+      weight = userData['weight'] ?? "50 kg";
+      height = userData['height'] ?? "165 cm";
     });
   }
 
@@ -81,6 +85,30 @@ class _ProfilePageState extends State<ProfilePage> {
               email,
               style: const TextStyle(color: Colors.grey),
             ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.green.withOpacity(0.3)),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.cloud_done, color: Colors.green, size: 16),
+                  SizedBox(width: 6),
+                  Text(
+                    "Connected with Firebase",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 20),
             buildTile(Icons.person, "Name", name),
             buildTile(Icons.cake, "Age", age),
@@ -121,6 +149,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     weight: result["weight"],
                     height: result["height"],
                   );
+                  final firebaseUser = FirebaseAuth.instance.currentUser;
+                  if (firebaseUser != null) {
+                    try {
+                      if (result["name"] != firebaseUser.displayName) {
+                        await firebaseUser.updateDisplayName(result["name"]);
+                      }
+                      if (result["email"] != firebaseUser.email) {
+                        await firebaseUser.verifyBeforeUpdateEmail(result["email"]);
+                      }
+                    } catch (e) {
+                      debugPrint("Failed to update Firebase profile: $e");
+                    }
+                  }
                   _loadProfileData();
                 }
               },
