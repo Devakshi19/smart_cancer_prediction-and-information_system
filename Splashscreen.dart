@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login.dart';
+
+import 'package:google_sign_in/google_sign_in.dart';
+import 'user_session.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,11 +18,20 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 3), () async {
+      try {
+        await FirebaseAuth.instance.signOut();
+        await UserSession.logout();
+        await GoogleSignIn().signOut();
+      } catch (e) {
+        debugPrint("Error signing out during splash screen: $e");
+      }
+
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const HomePage(),
+          builder: (context) => const LoginPage(),
         ),
       );
     });
