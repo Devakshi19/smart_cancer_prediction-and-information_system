@@ -233,7 +233,6 @@ class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Filter doctors based on current search input
     final filteredDoctors = _allDoctors.where((doctor) {
       final query = _searchQuery.toLowerCase();
       return doctor['name']!.toLowerCase().contains(query) ||
@@ -277,22 +276,7 @@ class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  filterChip(context, "Location"),
-                  const SizedBox(width: 10),
-                  filterChip(context, "Hospital"),
-                  const SizedBox(width: 10),
-                  filterChip(context, "Specialization"),
-                ],
-              ),
-            ),
             const SizedBox(height: 20),
-
-            // Filtered Doctor List
             ...filteredDoctors.map(
               (doctor) => doctorCard(
                 context,
@@ -307,19 +291,6 @@ class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget filterChip(BuildContext context, String title) {
-    return Chip(
-      label: Text(title),
-      backgroundColor: Theme.of(context).cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
         ),
       ),
     );
