@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
@@ -63,7 +62,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppState.tr('settings')),
+        title: Text(
+          AppState.tr('SETTINGS'),
+        ),
         backgroundColor: const Color(0xFF9A95E8),
         foregroundColor: Colors.white,
       ),
