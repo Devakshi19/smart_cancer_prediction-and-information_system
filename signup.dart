@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project/main.dart';
 import 'login.dart';
 import 'user_session.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -100,6 +101,14 @@ class _SignupPageState extends State<SignupPage> {
     setState(() => _isLoading = true);
     try {
       GoogleAuthProvider googleProvider = GoogleAuthProvider();
+      googleProvider.setCustomParameters({'prompt': 'select_account'});
+
+      try {
+        await GoogleSignIn().signOut();
+      } catch (e) {
+        debugPrint("Google Sign-In signOut error: $e");
+      }
+
       UserCredential userCredential =
       await FirebaseAuth.instance.signInWithPopup(googleProvider);
 
@@ -113,8 +122,6 @@ class _SignupPageState extends State<SignupPage> {
 
         if (!mounted) return;
         _showSnackBar("Signed up successfully with Google!", Colors.green);
-
-        // Go straight to Home Page since Google verifies email automatically
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => const HomePage()),
