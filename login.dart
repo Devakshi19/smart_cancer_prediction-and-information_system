@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project/main.dart';
 import 'signup.dart';
 import 'user_session.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -31,29 +32,18 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      // 1. Authenticate user credentials with Firebase
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-
       User? user = userCredential.user;
-
-      // 2. Fetch latest verification status from Firebase
       await user?.reload();
       user = FirebaseAuth.instance.currentUser;
-
-      // 3. STRICT CHECK: If email is NOT verified, show warning dialog BEFORE signing out
       if (user != null && !user.emailVerified) {
         if (!mounted) return;
-
-        // Show Dialog (User stays active so Resend Email works)
         await _showUnverifiedDialog(user);
-
-        // Revoke session after user closes the dialog
         await FirebaseAuth.instance.signOut();
         return;
       }
-
-      // 4. Verification Check Passed -> Save User Session
+      
       final userName =
       (user?.displayName != null && user!.displayName!.isNotEmpty)
           ? user.displayName!
@@ -66,8 +56,6 @@ class _LoginPageState extends State<LoginPage> {
 
       if (!mounted) return;
       _showSnackBar("Login Successful", Colors.green);
-
-      // Navigate to Home Page
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const HomePage()),
@@ -109,6 +97,14 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
     try {
       GoogleAuthProvider googleProvider = GoogleAuthProvider();
+      googleProvider.setCustomParameters({'prompt': 'select_account'});
+
+      try {
+        await GoogleSignIn().signOut();
+      } catch (e) {
+        debugPrint("Google Sign-In signOut error: $e");
+      }
+
       UserCredential userCredential =
       await FirebaseAuth.instance.signInWithPopup(googleProvider);
 
@@ -140,7 +136,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Dialog with dynamic Cooldown Timer for Resend Email
   Future<void> _showUnverifiedDialog(User user) async {
     int cooldownSeconds = 0;
     Timer? timer;
