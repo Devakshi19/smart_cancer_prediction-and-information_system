@@ -64,7 +64,6 @@ class BreastCancerCard extends StatelessWidget {
                     height: 120,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
-                      // Fallback icon if the image file is missing
                       return const Icon(
                         Icons.air,
                         size: 120,
@@ -99,10 +98,10 @@ class BreastCancerCard extends StatelessWidget {
                     Row(
                       children: [
                         Image.asset(
-                          'assets/images/ai_bot.png', 
+                          'assets/images/ai_bot.png',
                           width: 24,
                           height: 24,
-                          color: Colors.white, 
+                          color: Colors.white,
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(Icons.smart_toy, color: Colors.white),
                         ),
@@ -163,8 +162,7 @@ class _BreastCancerDetailsPageState extends State<BreastCancerDetailsPage> {
       'address':
           'Plot No. 67/1, Off Science City Road, Opp. Panchamrut Bunglows, Sola, Ahmedabad - 380060',
       'phone': '+91 79 3010 1257',
-      'image':
-          'assets/Breast_Cancer/Dr. Noopur Patel.jpg', // Asset image path or network URL
+      'image': 'assets/Breast_Cancer/Dr. Noopur Patel.jpg',
     },
     {
       'name': 'Dr Shalin Shah',
@@ -296,19 +294,6 @@ class _BreastCancerDetailsPageState extends State<BreastCancerDetailsPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  filterChip(context, "Location"),
-                  const SizedBox(width: 10),
-                  filterChip(context, "Hospital"),
-                  const SizedBox(width: 10),
-                  filterChip(context, "Specialization"),
-                ],
-              ),
-            ),
             const SizedBox(height: 20),
             ...filteredDoctors.map(
               (doctor) => doctorCard(
@@ -324,19 +309,6 @@ class _BreastCancerDetailsPageState extends State<BreastCancerDetailsPage> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget filterChip(BuildContext context, String title) {
-    return Chip(
-      label: Text(title),
-      backgroundColor: Theme.of(context).cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
         ),
       ),
     );
