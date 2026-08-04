@@ -59,7 +59,7 @@ class LungCancerCard extends StatelessWidget {
                 child: Opacity(
                   opacity: 0.15,
                   child: Image.asset(
-                    'assets/images/lung_icon.png', // <-- REPLACE WITH YOUR ASSET IMAGE PATH
+                    'assets/images/lung_icon.png',
                     width: 120,
                     height: 120,
                     fit: BoxFit.contain,
@@ -98,10 +98,10 @@ class LungCancerCard extends StatelessWidget {
                     Row(
                       children: [
                         Image.asset(
-                          'assets/images/ai_bot.png', // <-- REPLACE WITH YOUR ASSET IMAGE PATH
+                          'assets/images/ai_bot.png',
                           width: 24,
                           height: 24,
-                          color: Colors.white, // Applies tint color if needed
+                          color: Colors.white,
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(Icons.smart_toy, color: Colors.white),
                         ),
@@ -151,7 +151,6 @@ class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // Added 'image' field for doctor profiles
   final List<Map<String, String>> _allDoctors = [
     {
       'name': 'Dr Abhishek Jain',
@@ -289,19 +288,6 @@ class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  filterChip(context, "Location"),
-                  const SizedBox(width: 10),
-                  filterChip(context, "Hospital"),
-                  const SizedBox(width: 10),
-                  filterChip(context, "Specialization"),
-                ],
-              ),
-            ),
             const SizedBox(height: 20),
             ...filteredDoctors.map(
               (doctor) => doctorCard(
@@ -318,18 +304,6 @@ class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget filterChip(BuildContext context, String title) {
-    return Chip(
-      label: Text(title),
-      backgroundColor: Theme.of(context).cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side:
-            BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.2)),
       ),
     );
   }
@@ -363,7 +337,6 @@ class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 3. REPLACED PROFILE ICON WITH CIRCULAR DOCTOR IMAGE
                   CircleAvatar(
                     radius: 28,
                     backgroundColor:
@@ -443,8 +416,11 @@ class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
               const Divider(height: 24),
               Row(
                 children: [
-                  Icon(Icons.local_hospital,
-                      size: 16, color: theme.iconTheme.color?.withOpacity(0.6)),
+                  Icon(
+                    Icons.local_hospital,
+                    size: 16,
+                    color: theme.iconTheme.color?.withValues(alpha: 0.6),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -461,8 +437,11 @@ class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.location_on,
-                      size: 16, color: theme.iconTheme.color?.withOpacity(0.6)),
+                  Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: theme.iconTheme.color?.withValues(alpha: 0.6),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
