@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens.dart';
 import 'widgets.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 
 class ThemeManager extends ChangeNotifier {
@@ -197,10 +199,43 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadDrawerUserData() async {
     final userData = await UserSession.getUser();
+    final firebaseUser = FirebaseAuth.instance.currentUser;
     setState(() {
-      currentUserName = userData['name'] ?? "Cancer Detection App";
-      currentUserEmail = userData['email'] ?? "AI-Based Cancer Detection";
+      currentUserName = firebaseUser?.displayName ?? userData['name'] ?? "Cancer Detection App";
+      currentUserEmail = firebaseUser?.email ?? userData['email'] ?? "AI-Based Cancer Detection";
     });
+  }
+
+  Widget _buildQuickStatItem(String label, String value, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: const Color(0xFF9A95E8), size: 22),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickStatDivider() {
+    return Container(
+      height: 35,
+      width: 1,
+      color: Colors.grey.withOpacity(0.2),
+    );
   }
 
   void _showQuickScanModal(BuildContext context) {
@@ -267,46 +302,154 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
-              );
-            },
-            child: Text(
-              AppState.tr('login'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SignupPage()),
-              );
-            },
-            child: Text(
-              AppState.tr('signup'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-        ],
       ),
       body: ListView(
-        children: const [
-          SkinCancerCard(),
-          LungCancerCard(),
-          UterineCancerCard(),
-          BreastCancerCard(),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        children: [
+          // Welcome Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Hello, ${currentUserName.split(' ')[0]} 👋",
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      "Your health is our top priority",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF9A95E8),
+                        width: 2.0,
+                      ),
+                    ),
+                    child: const CircleAvatar(
+                      radius: 22,
+                      backgroundImage: AssetImage("assets/profile.png"),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Screening Stats Card
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                gradient: LinearGradient(
+                  colors: Theme.of(context).brightness == Brightness.dark
+                      ? [const Color(0xFF1E1E2F), const Color(0xFF2E2E4A)]
+                      : [const Color(0xFFF3F2FF), Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(
+                  color: const Color(0xFF9A95E8).withOpacity(0.15),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "AI Screening Dashboard",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF9A95E8),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF9A95E8).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.check_circle, size: 14, color: Color(0xFF9A95E8)),
+                            SizedBox(width: 4),
+                            Text(
+                              "Connected",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF9A95E8),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildQuickStatItem("Total Scans", "08", Icons.analytics_outlined),
+                      _buildQuickStatDivider(),
+                      _buildQuickStatItem("Active Scans", "00", Icons.play_circle_outline),
+                      _buildQuickStatDivider(),
+                      _buildQuickStatItem("Last Scan", "12 July", Icons.calendar_today_outlined),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Section Title
+          const Padding(
+            padding: EdgeInsets.only(left: 20, top: 15, bottom: 5),
+            child: Text(
+              "Select Detection Tool",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+
+          const SkinCancerCard(),
+          const LungCancerCard(),
+          const UterineCancerCard(),
+          const BreastCancerCard(),
         ],
       ),
       drawer: Drawer(
@@ -446,8 +589,12 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 );
-                if (logout == true) {
+                 if (logout == true) {
                   await UserSession.logout();
+                  await FirebaseAuth.instance.signOut();
+                  try {
+                    await GoogleSignIn().signOut();
+                  } catch (_) {}
                   if (!context.mounted) return;
                   Navigator.pushAndRemoveUntil(
                     context,
