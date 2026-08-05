@@ -589,7 +589,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 );
-                 if (logout == true) {
+                if (logout == true) {
                   await UserSession.logout();
                   await FirebaseAuth.instance.signOut();
                   try {
