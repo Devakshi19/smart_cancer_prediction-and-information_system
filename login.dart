@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:project/main.dart';
 import 'signup.dart';
 import 'user_session.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'user_details_input.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,108 +19,84 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
   bool _isLoading = false;
+  bool _obscurePassword = true;
+
+  // Exact Lavender Color Palette
+  static const Color primaryColor = Color(0xFF988AF1);
+  static const Color darkTextColor = Color(0xFF231F40);
+  static const Color subTextColor = Color(0xFF8E8CA3);
+  static const Color backgroundColor = Color(0xFFF4F4FA);
+  static const Color cardColor = Colors.white;
+  static const Color inputFillColor = Color(0xFFF7F6FC);
+
+  bool _isValidEmail(String email) {
+    return RegExp(
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(email);
+  }
 
   void _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showSnackBar("Email and Password are required", Colors.redAccent);
+      _showSnackBar("Please enter both email and password.", Colors.redAccent);
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    if (!_isValidEmail(email)) {
+      _showSnackBar("Please enter a valid email address.", Colors.redAccent);
+      return;
+    }
+
+    setState(() => _isLoading = true);
 
     try {
       UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-      User? user = userCredential.user;
-      await user?.reload();
-      user = FirebaseAuth.instance.currentUser;
-      if (user != null && !user.emailVerified) {
-        if (!mounted) return;
-        await _showUnverifiedDialog(user);
-        await FirebaseAuth.instance.signOut();
-        return;
-      }
-      
-      final userName =
-      (user?.displayName != null && user!.displayName!.isNotEmpty)
-          ? user.displayName!
-          : 'User';
-
-      await UserSession.saveUser(
-        name: userName,
-        email: user?.email ?? email,
+          .signInWithEmailAndPassword(email: email, password: password)
+          .timeout(
+        const Duration(seconds: 12),
+        onTimeout: () => throw TimeoutException("Connection timed out."),
       );
-
-      if (!mounted) return;
-      _showSnackBar("Login Successful", Colors.green);
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-            (route) => false,
-      );
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-
-      String errorMessage = "Login Failed";
-      if (e.code == 'user-not-found' ||
-          e.code == 'wrong-password' ||
-          e.code == 'invalid-credential') {
-        errorMessage = "Incorrect email address or password.";
-      } else if (e.code == 'invalid-email') {
-        errorMessage = "The email address is badly formatted.";
-      } else if (e.code == 'user-disabled') {
-        errorMessage = "This account has been disabled.";
-      } else if (e.code == 'too-many-requests') {
-        errorMessage =
-        "Too many failed attempts. Please wait a few minutes before trying again.";
-      } else if (e.message != null) {
-        errorMessage = e.message!;
-      }
-
-      _showSnackBar(errorMessage, Colors.redAccent);
-    } catch (e) {
-      if (!mounted) return;
-      _showSnackBar("An unexpected error occurred: $e", Colors.redAccent);
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  void _handleGoogleLogin() async {
-    setState(() => _isLoading = true);
-    try {
-      GoogleAuthProvider googleProvider = GoogleAuthProvider();
-      googleProvider.setCustomParameters({'prompt': 'select_account'});
-
-      try {
-        await GoogleSignIn().signOut();
-      } catch (e) {
-        debugPrint("Google Sign-In signOut error: $e");
-      }
-
-      UserCredential userCredential =
-      await FirebaseAuth.instance.signInWithPopup(googleProvider);
 
       User? user = userCredential.user;
 
       if (user != null) {
-        await UserSession.saveUser(
-          name: user.displayName ?? "User",
-          email: user.email ?? "",
-        );
+        if (!user.emailVerified) {
+          await FirebaseAuth.instance.signOut();
+          if (!mounted) return;
+
+          _showEmailUnverifiedDialog(user);
+          return;
+        }
+
+        try {
+          DocumentSnapshot doc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get()
+              .timeout(const Duration(seconds: 5));
+
+          if (doc.exists && doc.data() != null) {
+            final data = doc.data() as Map<String, dynamic>;
+            await UserSession.saveUser(
+              name: data['name'] ?? user.displayName ?? '',
+              email: data['email'] ?? email,
+              phone: data['phone'] ?? '',
+              age: data['age'] ?? '',
+              weight: data['weight'] ?? '',
+              height: data['height'] ?? '',
+              gender: data['gender'] ?? 'Female',
+            );
+          }
+        } catch (e) {
+          debugPrint("Firestore fetch error: $e");
+        }
 
         if (!mounted) return;
-        _showSnackBar("Login Successful!", Colors.green);
+        _showSnackBar("Welcome back!", primaryColor);
 
         Navigator.pushAndRemoveUntil(
           context,
@@ -126,167 +105,210 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
+      String msg = "Login failed.";
+      if (e.code == 'user-not-found' ||
+          e.code == 'wrong-password' ||
+          e.code == 'invalid-credential') {
+        msg = "Invalid email or password.";
+      } else if (e.message != null) {
+        msg = e.message!;
+      }
+      _showSnackBar(msg, Colors.redAccent);
+    } catch (e) {
+      _showSnackBar("Error: $e", Colors.redAccent);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _handleGoogleLogin() async {
+    setState(() => _isLoading = true);
+    try {
+      UserCredential? userCredential;
+
+      if (kIsWeb) {
+        GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        googleProvider.setCustomParameters({'prompt': 'select_account'});
+        userCredential =
+        await FirebaseAuth.instance.signInWithPopup(googleProvider);
+      } else {
+        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        if (googleUser == null) {
+          if (mounted) setState(() => _isLoading = false);
+          return;
+        }
+        final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+      }
+
+      User? user = userCredential.user;
+
+      if (user != null) {
+        final name = user.displayName ?? "User";
+        final email = user.email ?? "";
+
+        DocumentSnapshot? doc;
+        try {
+          doc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get()
+              .timeout(const Duration(seconds: 5));
+        } catch (e) {
+          debugPrint("Firestore lookup error: $e");
+        }
+
+        if (!mounted) return;
+
+        if (doc != null && doc.exists) {
+          final data = doc.data() as Map<String, dynamic>;
+          await UserSession.saveUser(
+            name: data['name'] ?? name,
+            email: data['email'] ?? email,
+            phone: data['phone'] ?? '',
+            age: data['age'] ?? '',
+            weight: data['weight'] ?? '',
+            height: data['height'] ?? '',
+            gender: data['gender'] ?? 'Female',
+          );
+
+          _showSnackBar("Logged in with Google!", primaryColor);
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const HomePage()),
+                (route) => false,
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => UserDetailsInputPage(
+                isGoogleSignUp: true,
+                name: name,
+                email: email,
+              ),
+            ),
+          );
+        }
+      }
+    } on FirebaseAuthException catch (e) {
       _showSnackBar(e.message ?? "Google Sign-In Failed", Colors.redAccent);
     } catch (e) {
-      if (!mounted) return;
       _showSnackBar("Google Sign-In Error: $e", Colors.redAccent);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  Future<void> _showUnverifiedDialog(User user) async {
-    int cooldownSeconds = 0;
-    Timer? timer;
-    bool isResending = false;
-
-    await showDialog(
+  void _showEmailUnverifiedDialog(User user) {
+    showDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          void startCooldown() {
-            setDialogState(() => cooldownSeconds = 60);
-            timer?.cancel();
-            timer = Timer.periodic(const Duration(seconds: 1), (t) {
-              if (cooldownSeconds > 0) {
-                setDialogState(() => cooldownSeconds--);
-              } else {
-                t.cancel();
-              }
-            });
-          }
-
-          return AlertDialog(
-            title: const Row(
-              children: [
-                Icon(Icons.warning_amber_rounded,
-                    color: Colors.orange, size: 28),
-                SizedBox(width: 8),
-                Text("Email Not Verified"),
-              ],
+      builder: (ctx) => AlertDialog(
+        backgroundColor: backgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: primaryColor, size: 28),
+            SizedBox(width: 10),
+            Text(
+              "Email Not Verified",
+              style: TextStyle(
+                color: darkTextColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Your email address has not been verified yet.",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.shade200),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.mark_email_unread, color: Colors.orange),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          "⚠️ WARNING: Please check your SPAM, JUNK, or PROMOTIONS folder if you cannot find the verification link in your inbox.",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.black87,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Your email address has not been verified yet.",
+              style: TextStyle(fontSize: 14, color: darkTextColor),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEBE8F9),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.mark_email_unread_rounded,
+                      color: primaryColor, size: 20),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      "Please check your SPAM, JUNK, or PROMOTIONS folder if you cannot find the verification link.",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: darkTextColor,
+                        height: 1.3,
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  "Click the link inside that email to enable your account, then try logging in again.",
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
-                ),
-              ],
+                ],
+              ),
             ),
-            actions: [
-              TextButton(
-                onPressed: (isResending || cooldownSeconds > 0)
-                    ? null
-                    : () async {
-                  setDialogState(() => isResending = true);
-                  try {
-                    await user.sendEmailVerification();
-                    if (!ctx.mounted) return;
-                    _showSnackBar(
-                      "Verification email resent! Check your Inbox and SPAM folder.",
-                      Colors.blue,
-                    );
-                    startCooldown();
-                  } on FirebaseAuthException catch (e) {
-                    if (!ctx.mounted) return;
-                    if (e.code == 'too-many-requests') {
-                      _showSnackBar(
-                        "Firebase rate-limit reached. An email was already sent recently — please wait 1–2 minutes before requesting another.",
-                        Colors.redAccent,
-                      );
-                      startCooldown();
-                    } else {
-                      _showSnackBar(
-                        e.message ?? "Failed to resend email.",
-                        Colors.redAccent,
-                      );
-                    }
-                  } catch (e) {
-                    if (!ctx.mounted) return;
-                    _showSnackBar("Error: $e", Colors.redAccent);
-                  } finally {
-                    if (ctx.mounted) {
-                      setDialogState(() => isResending = false);
-                    }
-                  }
-                },
-                child: isResending
-                    ? const SizedBox(
-                  height: 16,
-                  width: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-                    : Text(
-                  cooldownSeconds > 0
-                      ? "Wait (${cooldownSeconds}s)"
-                      : "Resend Email",
-                  style: TextStyle(
-                    color: cooldownSeconds > 0
-                        ? Colors.grey
-                        : const Color(0xFF9A95E8),
-                  ),
-                ),
+            const SizedBox(height: 12),
+            const Text(
+              "Click the link inside that email to enable your account, then try logging in again.",
+              style: TextStyle(fontSize: 13, color: subTextColor),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              try {
+                await user.sendEmailVerification();
+                _showSnackBar("Verification email resent!", primaryColor);
+              } catch (e) {
+                _showSnackBar("Failed to resend email.", Colors.redAccent);
+              }
+            },
+            child: const Text(
+              "Resend Email",
+              style: TextStyle(
+                color: primaryColor,
+                fontWeight: FontWeight.bold,
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF9A95E8),
-                ),
-                onPressed: () {
-                  timer?.cancel();
-                  Navigator.pop(ctx);
-                },
-                child: const Text(
-                  "OK",
-                  style: TextStyle(color: Colors.white),
-                ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
-            ],
-          );
-        },
+            ),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("OK", style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
     );
   }
 
-  void _showSnackBar(String message, Color backgroundColor) {
+  void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-        duration: const Duration(seconds: 4),
+        content: Text(message, style: const TextStyle(fontWeight: FontWeight.w600)),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -301,141 +323,333 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "LOGIN",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: const Color(0xFF9A95E8),
-        foregroundColor: Colors.white,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
+      backgroundColor: backgroundColor,
+      body: SafeArea(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 20),
-              const Icon(
-                Icons.account_circle,
-                size: 100,
-                color: Color(0xFF9A95E8),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 15),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: "Password",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
+              // Top Circle Icon Badge
+              Center(
+                child: Container(
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withOpacity(0.18),
+                        blurRadius: 24,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.person_rounded,
+                    size: 46,
+                    color: primaryColor,
+                  ),
                 ),
               ),
-              const SizedBox(height: 25),
-              SizedBox(
+              const SizedBox(height: 20),
+
+              // Header Titles
+              const Text(
+                "Welcome Back",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: darkTextColor,
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                "Log in to access your cancer prediction history",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: subTextColor,
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // White Form Card
+              Container(
                 width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF9A95E8),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: _isLoading ? null : _handleLogin,
-                  child: _isLoading
-                      ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
-                  )
-                      : const Text(
-                    "LOGIN",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: darkTextColor,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: "Email Address",
+                        labelStyle: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        floatingLabelStyle: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.email_outlined,
+                          color: primaryColor,
+                          size: 20,
+                        ),
+                        filled: true,
+                        fillColor: inputFillColor,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 16,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(
+                            color: primaryColor,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 16),
+
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: darkTextColor,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        labelStyle: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        floatingLabelStyle: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.lock_outline_rounded,
+                          color: primaryColor,
+                          size: 20,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: subTextColor,
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
+                        filled: true,
+                        fillColor: inputFillColor,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 16,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(
+                            color: primaryColor,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: _isLoading ? null : _handleLogin,
+                        child: _isLoading
+                            ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                            : const Text(
+                          "LOGIN",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              const Row(
+              const SizedBox(height: 24),
+
+              Row(
                 children: [
-                  Expanded(child: Divider(thickness: 1, color: Colors.grey)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
+                  Expanded(
+                    child: Divider(
+                      thickness: 1,
+                      color: Colors.grey.shade300,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       "OR",
                       style: TextStyle(
-                          color: Colors.grey, fontWeight: FontWeight.w500),
+                        color: subTextColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
-                  Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                  Expanded(
+                    child: Divider(
+                      thickness: 1,
+                      color: Colors.grey.shade300,
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
+
               SizedBox(
                 width: double.infinity,
-                height: 48,
+                height: 52,
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF9A95E8), width: 1.5),
+                    backgroundColor: Colors.white,
+                    side: BorderSide(color: Colors.grey.shade300, width: 1),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(14),
                     ),
+                    elevation: 0,
                   ),
                   onPressed: _isLoading ? null : _handleGoogleLogin,
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        "G",
-                        style: TextStyle(
-                          color: Color(0xFF9A95E8),
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: const BoxDecoration(
+                          color: primaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "G",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
                         ),
                       ),
-                      SizedBox(width: 10),
-                      Text(
+                      const SizedBox(width: 12),
+                      const Text(
                         "Continue with Google",
                         style: TextStyle(
-                          color: Color(0xFF9A95E8),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          color: darkTextColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 28),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don't have an account? "),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
+                  const Text(
+                    "Don't have an account? ",
+                    style: TextStyle(
+                      color: subTextColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => const SignupPage()),
+                        MaterialPageRoute(
+                          builder: (_) => const SignupPage(),
+                        ),
                       );
                     },
-                    child: const Text("Sign Up"),
+                    child: const Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                 ],
               ),
