@@ -13,3 +13,5 @@ export 'screens/searchpage.dart';
 export 'screens/AboutDevelopers.dart';
 export 'screens/settings_page.dart';
 export 'screens/user_session.dart';
+export 'screens/user_details_input.dart';
+export 'screens/scan_pages.dart';
