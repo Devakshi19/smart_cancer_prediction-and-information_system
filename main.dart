@@ -6,7 +6,6 @@ import 'screens.dart';
 import 'widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-
 class ThemeManager extends ChangeNotifier {
   static ThemeManager? _instance;
   ThemeManager._();
@@ -116,19 +115,24 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: "AIzaSyBUn8czg17vM8Jp4elyJdus10vs5TX9Ky0",
-        authDomain: "cancer-detection-app-4a51a.firebaseapp.com",
-        projectId: "cancer-detection-app-4a51a",
-        storageBucket: "cancer-detection-app-4a51a.firebasestorage.app",
-        messagingSenderId: "573751912810",
-        appId: "1:573751912810:web:2842a33e953e529e079d13",
-        measurementId: "G-7702EMXK8C",
-      ),
-    );
+    await Firebase.initializeApp();
   } catch (e) {
-    debugPrint("Firebase initialization error: $e");
+    debugPrint("Native Firebase init error, falling back to options: $e");
+    try {
+      await Firebase.initializeApp(
+        options: const FirebaseOptions(
+          apiKey: "AIzaSyBUn8czg17vM8Jp4elyJdus10vs5TX9Ky0",
+          authDomain: "cancer-detection-app-4a51a.firebaseapp.com",
+          projectId: "cancer-detection-app-4a51a",
+          storageBucket: "cancer-detection-app-4a51a.firebasestorage.app",
+          messagingSenderId: "573751912810",
+          appId: "1:573751912810:web:2842a33e953e529e079d13",
+          measurementId: "G-7702EMXK8C",
+        ),
+      );
+    } catch (e2) {
+      debugPrint("Firebase initialization error: $e2");
+    }
   }
 
   await AppState.init();
@@ -201,8 +205,10 @@ class _HomePageState extends State<HomePage> {
     final userData = await UserSession.getUser();
     final firebaseUser = FirebaseAuth.instance.currentUser;
     setState(() {
-      currentUserName = firebaseUser?.displayName ?? userData['name'] ?? "Cancer Detection App";
-      currentUserEmail = firebaseUser?.email ?? userData['email'] ?? "AI-Based Cancer Detection";
+      currentUserName =
+          firebaseUser?.displayName ?? userData['name'] ?? "Cancer Detection App";
+      currentUserEmail =
+          firebaseUser?.email ?? userData['email'] ?? "AI-Based Cancer Detection";
     });
   }
 
@@ -244,7 +250,7 @@ class _HomePageState extends State<HomePage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) {
+      builder: (modalContext) {
         return Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -262,7 +268,13 @@ class _HomePageState extends State<HomePage> {
                 title: const Text("Skin Cancer Detection"),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(modalContext);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SkinCancerScanPage(),
+                    ),
+                  );
                 },
               ),
               ListTile(
@@ -271,7 +283,13 @@ class _HomePageState extends State<HomePage> {
                 title: const Text("Lung Cancer (Chest X-Ray)"),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(modalContext);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LungCancerScanPage(),
+                    ),
+                  );
                 },
               ),
               ListTile(
@@ -279,7 +297,28 @@ class _HomePageState extends State<HomePage> {
                 title: const Text("Breast Cancer Detection"),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(modalContext);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BreastCancerScanPage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.health_and_safety,
+                    color: Color(0xFF9A95E8)),
+                title: const Text("Uterine Cancer Detection"),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: () {
+                  Navigator.pop(modalContext);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UterineCancerScanPage(),
+                    ),
+                  );
                 },
               ),
             ],
@@ -306,7 +345,6 @@ class _HomePageState extends State<HomePage> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 10),
         children: [
-          // Welcome Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
@@ -354,8 +392,6 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-
-          // Screening Stats Card
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: Container(
@@ -395,14 +431,16 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: const Color(0xFF9A95E8).withOpacity(0.15),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Row(
                           children: [
-                            Icon(Icons.check_circle, size: 14, color: Color(0xFF9A95E8)),
+                            Icon(Icons.check_circle,
+                                size: 14, color: Color(0xFF9A95E8)),
                             SizedBox(width: 4),
                             Text(
                               "Connected",
@@ -421,19 +459,20 @@ class _HomePageState extends State<HomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildQuickStatItem("Total Scans", "08", Icons.analytics_outlined),
+                      _buildQuickStatItem(
+                          "Total Scans", "08", Icons.analytics_outlined),
                       _buildQuickStatDivider(),
-                      _buildQuickStatItem("Active Scans", "00", Icons.play_circle_outline),
+                      _buildQuickStatItem(
+                          "Active Scans", "00", Icons.play_circle_outline),
                       _buildQuickStatDivider(),
-                      _buildQuickStatItem("Last Scan", "12 July", Icons.calendar_today_outlined),
+                      _buildQuickStatItem(
+                          "Last Scan", "12 July", Icons.calendar_today_outlined),
                     ],
                   ),
                 ],
               ),
             ),
           ),
-
-          // Section Title
           const Padding(
             padding: EdgeInsets.only(left: 20, top: 15, bottom: 5),
             child: Text(
@@ -445,7 +484,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-
           const SkinCancerCard(),
           const LungCancerCard(),
           const UterineCancerCard(),
