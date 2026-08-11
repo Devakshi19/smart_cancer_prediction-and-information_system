@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'scan_service.dart';
 
@@ -155,6 +156,30 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
                 ],
               ),
+
+              // Uploaded Image Display in Report Modal
+              if (scan.imageUrl != null && scan.imageUrl!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: scan.imageUrl!.startsWith('http')
+                      ? Image.network(
+                    scan.imageUrl!,
+                    height: 180,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  )
+                      : Image.file(
+                    File(scan.imageUrl!),
+                    height: 180,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  ),
+                ),
+              ],
+
               const Divider(height: 32),
               _buildReportDetailRow("Date & Time", "${scan.date} at ${scan.time}"),
               _buildReportDetailRow("Scan ID", scan.id),
@@ -426,6 +451,38 @@ class HistoryCard extends StatelessWidget {
     required this.onDelete,
   });
 
+  Widget _buildScanThumbnail() {
+    if (scan.imageUrl != null && scan.imageUrl!.isNotEmpty) {
+      if (scan.imageUrl!.startsWith('http')) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Image.network(
+            scan.imageUrl!,
+            width: 48,
+            height: 48,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Icon(scan.icon, color: scan.color, size: 24),
+          ),
+        );
+      } else {
+        final file = File(scan.imageUrl!);
+        if (file.existsSync()) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Image.file(
+              file,
+              width: 48,
+              height: 48,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Icon(scan.icon, color: scan.color, size: 24),
+            ),
+          );
+        }
+      }
+    }
+    return Icon(scan.icon, color: scan.color, size: 24);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isNormal = scan.result == "Normal";
@@ -461,7 +518,7 @@ class HistoryCard extends StatelessWidget {
                     color: scan.color.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Icon(scan.icon, color: scan.color, size: 24),
+                  child: _buildScanThumbnail(),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
