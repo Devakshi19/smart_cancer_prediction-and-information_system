@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'scan_service.dart';
 
 class ScanRecord {
   final String id;
   final String cancerType;
   final String date;
   final String time;
-  final String result; 
-  final double confidence; 
+  final String result;
+  final double confidence;
   final String hospital;
   final IconData icon;
   final Color color;
+  final String? imageUrl;
+  final int? timestamp;
 
   const ScanRecord({
     required this.id,
@@ -21,7 +24,40 @@ class ScanRecord {
     required this.hospital,
     required this.icon,
     required this.color,
+    this.imageUrl,
+    this.timestamp,
   });
+
+  factory ScanRecord.fromMap(String docId, Map<String, dynamic> map) {
+    String type = map['cancerType'] ?? 'Skin Cancer';
+    IconData icon = Icons.health_and_safety_rounded;
+    Color color = const Color(0xFFF97316);
+
+    if (type.contains('Breast')) {
+      icon = Icons.favorite_rounded;
+      color = const Color(0xFFEC4899);
+    } else if (type.contains('Uterine')) {
+      icon = Icons.medical_services_rounded;
+      color = const Color(0xFFEAB308);
+    } else if (type.contains('Lung')) {
+      icon = Icons.air_rounded;
+      color = const Color(0xFF3B82F6);
+    }
+
+    return ScanRecord(
+      id: docId,
+      cancerType: type,
+      date: map['date'] ?? 'Today',
+      time: map['time'] ?? '10:00 AM',
+      result: map['result'] ?? 'Normal',
+      confidence: (map['confidence'] as num?)?.toDouble() ?? 0.95,
+      hospital: map['hospital'] ?? 'AI Diagnostic Center',
+      icon: icon,
+      color: color,
+      imageUrl: map['imageUrl'],
+      timestamp: map['timestamp'] as int?,
+    );
+  }
 }
 
 class HistoryPage extends StatefulWidget {
@@ -33,52 +69,25 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   String _selectedFilter = "All";
-  final List<ScanRecord> _allScans = [
-    const ScanRecord(
-      id: "1",
-      cancerType: "Breast Cancer",
-      date: "12 Jul 2026",
-      time: "10:30 AM",
-      result: "Normal",
-      confidence: 0.98,
-      hospital: "AI Medical Center",
-      icon: Icons.favorite_rounded,
-      color: Color(0xFFEC4899),
-    ),
-    const ScanRecord(
-      id: "2",
-      cancerType: "Skin Cancer",
-      date: "10 Jul 2026",
-      time: "02:15 PM",
-      result: "Suspicious",
-      confidence: 0.91,
-      hospital: "Cancer Care Hospital",
-      icon: Icons.health_and_safety_rounded,
-      color: Color(0xFFF97316),
-    ),
-    const ScanRecord(
-      id: "3",
-      cancerType: "Uterine Cancer",
-      date: "05 Jul 2026",
-      time: "10:00 AM",
-      result: "Normal",
-      confidence: 0.89,
-      hospital: "AI Medical Center",
-      icon: Icons.medical_services_rounded,
-      color: Color(0xFFEAB308),
-    ),
-    const ScanRecord(
-      id: "4",
-      cancerType: "Lung Cancer",
-      date: "05 Jul 2026",
-      time: "09:45 AM",
-      result: "Normal",
-      confidence: 0.96,
-      hospital: "Apollo Hospital",
-      icon: Icons.air_rounded,
-      color: Color(0xFF3B82F6),
-    ),
-  ];
+  List<ScanRecord> _allScans = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserScans();
+  }
+
+  Future<void> _loadUserScans() async {
+    setState(() => _isLoading = true);
+    final userScans = await ScanService.getUserScans();
+    if (mounted) {
+      setState(() {
+        _allScans = userScans;
+        _isLoading = false;
+      });
+    }
+  }
 
   List<ScanRecord> get _filteredScans {
     if (_selectedFilter == "Normal") {
@@ -88,7 +97,7 @@ class _HistoryPageState extends State<HistoryPage> {
     }
     return _allScans;
   }
-  
+
   void _onViewReport(ScanRecord scan) {
     showModalBottomSheet(
       context: context,
@@ -208,7 +217,7 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
     );
   }
-  
+
   void _onDeleteScan(ScanRecord scan) {
     showDialog(
       context: context,
@@ -230,11 +239,13 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(dialogContext);
+                await ScanService.deleteScanRecord(scan.id);
                 setState(() {
                   _allScans.removeWhere((item) => item.id == scan.id);
                 });
+                if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text("${scan.cancerType} scan deleted."),
