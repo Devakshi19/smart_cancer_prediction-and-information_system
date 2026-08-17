@@ -29,7 +29,7 @@ class _SignupPageState extends State<SignupPage> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-  // Exact Lavender Color Palette
+  // Lavender Theme Palette
   static const Color primaryColor = Color(0xFF988AF1);
   static const Color darkTextColor = Color(0xFF231F40);
   static const Color subTextColor = Color(0xFF8E8CA3);
@@ -145,7 +145,7 @@ class _SignupPageState extends State<SignupPage> {
               ],
             ),
             content: Text(
-              "Account registered successfully!\n\nA verification link has been sent to:\n\n$email\n\nPlease check your inbox (or spam) and click the link to verify your email before logging in.",
+              "Account registered successfully!\n\nA verification link has been sent to:\n\n$email\n\nPlease check your inbox and click the link before logging in.",
               style: const TextStyle(fontSize: 14, height: 1.4, color: darkTextColor),
             ),
             actions: [
@@ -201,21 +201,26 @@ class _SignupPageState extends State<SignupPage> {
         GoogleAuthProvider googleProvider = GoogleAuthProvider();
         googleProvider.setCustomParameters({'prompt': 'select_account'});
         userCredential =
-        await FirebaseAuth.instance.signInWithPopup(googleProvider);
+            await FirebaseAuth.instance.signInWithPopup(googleProvider);
       } else {
-        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        final GoogleSignIn googleSignIn = GoogleSignIn(
+          serverClientId:
+              '573751912810-dvlfbkekspvtn2k1u7qeu8opf0fh5sus.apps.googleusercontent.com',
+          scopes: ['email', 'profile'],
+        );
+        final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
         if (googleUser == null) {
           if (mounted) setState(() => _isLoading = false);
           return;
         }
         final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+            await googleUser.authentication;
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
         userCredential =
-        await FirebaseAuth.instance.signInWithCredential(credential);
+            await FirebaseAuth.instance.signInWithCredential(credential);
       }
 
       User? user = userCredential.user;
@@ -270,9 +275,15 @@ class _SignupPageState extends State<SignupPage> {
         }
       }
     } on FirebaseAuthException catch (e) {
-      _showSnackBar(e.message ?? "Google Sign-In Failed", Colors.redAccent);
+      debugPrint("FirebaseAuthException during Google Signup: ${e.code} - ${e.message}");
+      _showSnackBar(e.message ?? "Google Signup Failed (${e.code})", Colors.redAccent);
     } catch (e) {
-      _showSnackBar("Google Sign-In Error: $e", Colors.redAccent);
+      debugPrint("Detailed Google Signup Exception: $e");
+      String errorMsg = e.toString();
+      if (errorMsg.contains("10") || errorMsg.contains("DeveloperError") || errorMsg.contains("ApiException: 10")) {
+        errorMsg = "Google Sign-In requires SHA-1 in Firebase Console. Please register with Email & Password or add SHA-1.";
+      }
+      _showSnackBar(errorMsg, Colors.redAccent);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -313,7 +324,6 @@ class _SignupPageState extends State<SignupPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Top Circle Icon Badge
               Center(
                 child: Container(
                   width: 88,
@@ -338,8 +348,6 @@ class _SignupPageState extends State<SignupPage> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Header Titles
               const Text(
                 "Create Account",
                 textAlign: TextAlign.center,
@@ -360,7 +368,6 @@ class _SignupPageState extends State<SignupPage> {
               ),
               const SizedBox(height: 28),
 
-              // White Form Card
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
@@ -393,7 +400,6 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Password Field
                     TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
@@ -404,11 +410,6 @@ class _SignupPageState extends State<SignupPage> {
                           color: Colors.black87,
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
-                        ),
-                        floatingLabelStyle: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
                         ),
                         prefixIcon: const Icon(Icons.lock_outline_rounded,
                             color: primaryColor, size: 20),
@@ -434,15 +435,6 @@ class _SignupPageState extends State<SignupPage> {
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(
-                              color: primaryColor, width: 1.5),
-                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -455,7 +447,6 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Gender Field with black floating label
                     DropdownButtonFormField<String>(
                       value: _selectedGender,
                       style: const TextStyle(fontSize: 15, color: darkTextColor),
@@ -466,11 +457,6 @@ class _SignupPageState extends State<SignupPage> {
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
-                        floatingLabelStyle: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
                         prefixIcon: const Icon(Icons.female_rounded,
                             color: primaryColor, size: 20),
                         filled: true,
@@ -480,15 +466,6 @@ class _SignupPageState extends State<SignupPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(
-                              color: primaryColor, width: 1.5),
                         ),
                       ),
                       items: ['Female', 'Male', 'Other']
@@ -505,9 +482,10 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     const SizedBox(height: 16),
 
+                    // Mobile Number Field
                     _buildInputField(
                       controller: _phoneController,
-                      label: "Mobile Number",
+                      label: "Mobile Number (e.g. +919876543210)",
                       icon: Icons.phone_outlined,
                       keyboardType: TextInputType.phone,
                     ),
@@ -698,11 +676,6 @@ class _SignupPageState extends State<SignupPage> {
           fontSize: 15,
           fontWeight: FontWeight.w500,
         ),
-        floatingLabelStyle: const TextStyle(
-          color: Colors.black87,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
         prefixIcon: Icon(icon, color: primaryColor, size: 20),
         filled: true,
         fillColor: inputFillColor,
@@ -710,14 +683,6 @@ class _SignupPageState extends State<SignupPage> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: primaryColor, width: 1.5),
         ),
       ),
     );
