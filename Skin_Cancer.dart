@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart'; // ADD THIS
+
 
 class SkinCancerCard extends StatelessWidget {
   const SkinCancerCard({super.key});
@@ -145,7 +147,7 @@ class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
       'location': 'Ellisbridge, Ahmedabad, Gujarat',
       'address':
           'Akshara Complex, 12 Shanti Sadan Co-op Housing Society Ltd., Near Parimal Garden, Ellisbridge, Ahmedabad - 380006',
-      'phone': '+91 79 4073 4073\n+91 84018 01066',
+      'phone': '+91 84018 01066',
       'imagePath': 'assets/Dr. Murtuza I. Laxmidhar.jpg',
     },
     {
@@ -224,6 +226,26 @@ class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
       'imagePath': 'assets/Dr. Akash Shah.jpg',
     },
   ];
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    // Remove spaces, newlines, and text like "Contact Hospital"
+    String cleanedNumber = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
+
+    if (cleanedNumber.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Phone number not available")),
+      );
+      return;
+    }
+
+    final Uri phoneUri = Uri(scheme: 'tel', path: cleanedNumber);
+    if (await canLaunchUrl(phoneUri)) {
+      await launchUrl(phoneUri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Could not call $phoneNumber")),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -431,7 +453,7 @@ class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => _makePhoneCall(phone), // CHANGED: NOW CALLS
                   icon: const Icon(Icons.phone, size: 18),
                   label: Text(phone),
                   style: ElevatedButton.styleFrom(
