@@ -9,6 +9,7 @@ class UserSession {
     String? age,
     String? weight,
     String? height,
+    String? gender,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('name', name);
@@ -17,6 +18,7 @@ class UserSession {
     if (age != null) await prefs.setString('age', age);
     if (weight != null) await prefs.setString('weight', weight);
     if (height != null) await prefs.setString('height', height);
+    if (gender != null) await prefs.setString('gender', gender);
     await prefs.setBool('isLoggedIn', true);
   }
 
@@ -29,6 +31,7 @@ class UserSession {
       'age': prefs.getString('age') ?? '21 Years',
       'weight': prefs.getString('weight') ?? '50 kg',
       'height': prefs.getString('height') ?? '165 cm',
+      'gender': prefs.getString('gender') ?? 'Female',
     };
   }
 
@@ -36,4 +39,6 @@ class UserSession {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }
+
+  static init() {}
 }
