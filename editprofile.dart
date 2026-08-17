@@ -7,6 +7,7 @@ class EditProfilePage extends StatefulWidget {
   final String age;
   final String weight;
   final String height;
+  final String gender;
 
   const EditProfilePage({
     super.key,
@@ -16,6 +17,7 @@ class EditProfilePage extends StatefulWidget {
     required this.age,
     required this.weight,
     required this.height,
+    required this.gender,
   });
 
   @override
@@ -29,6 +31,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController ageController;
   late TextEditingController weightController;
   late TextEditingController heightController;
+  late String selectedGender;
 
   @override
   void initState() {
@@ -40,6 +43,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ageController = TextEditingController(text: widget.age);
     weightController = TextEditingController(text: widget.weight);
     heightController = TextEditingController(text: widget.height);
+    selectedGender = widget.gender;
   }
 
   Widget buildField(String label, TextEditingController controller) {
@@ -76,6 +80,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
               buildField("Age", ageController),
               buildField("Weight", weightController),
               buildField("Height", heightController),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 15),
+                child: DropdownButtonFormField<String>(
+                  value: ['Female', 'Male', 'Other'].contains(selectedGender) ? selectedGender : 'Female',
+                  decoration: InputDecoration(
+                    labelText: "Gender",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  items: ['Female', 'Male', 'Other']
+                      .map((label) => DropdownMenuItem(
+                            value: label,
+                            child: Text(label),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedGender = value ?? 'Female';
+                    });
+                  },
+                ),
+              ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
@@ -86,6 +113,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     "age": ageController.text,
                     "weight": weightController.text,
                     "height": heightController.text,
+                    "gender": selectedGender,
                   });
                 },
                 child: const Text("Save"),
