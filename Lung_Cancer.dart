@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart'; // ADD THIS
 
 class LungCancerCard extends StatelessWidget {
   const LungCancerCard({super.key});
@@ -237,6 +238,27 @@ class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
     },
   ];
 
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    // Remove spaces, newlines, and text like "Contact Hospital"
+    String cleanedNumber = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
+
+    if (cleanedNumber.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Phone number not available")),
+      );
+      return;
+    }
+
+    final Uri phoneUri = Uri(scheme: 'tel', path: cleanedNumber);
+    if (await canLaunchUrl(phoneUri)) {
+      await launchUrl(phoneUri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Could not call $phoneNumber")),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -460,7 +482,7 @@ class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => _makePhoneCall(phone), // CHANGED: NOW CALLS
                   icon: const Icon(Icons.phone, size: 18),
                   label: Text(phone),
                   style: ElevatedButton.styleFrom(
