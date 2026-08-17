@@ -33,12 +33,13 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
   bool _isListening = false;
 
   final List<FAQItem> _faqDatabase = [
+    // ORIGINAL 4
     FAQItem(
       title: "How to use the app?",
       icon: Icons.help_outline,
       keywords: ["use", "app", "help", "guide", "navigate", "how"],
       answer:
-      "To use the app, tap any of the prompt pills on the home screen or type your health query in the message bar below.",
+      "To use the app, tap any of the prompt pills on the home screen or type your health query in the message bar below. You can scan, chat with AI, and view doctor details.",
     ),
     FAQItem(
       title: "What is Skin Cancer?",
@@ -60,6 +61,113 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
       keywords: ["breast", "mammogram", "lump", "tissue", "women"],
       answer:
       "Breast cancer originates in breast tissue cells. Regular self-examinations and routine mammograms are critical for early detection and high treatment success rates.",
+    ),
+
+    // NEW 15 APP RELATED QUESTIONS
+    FAQItem(
+      title: "How does AI Scan work?",
+      icon: Icons.camera_alt,
+      keywords: ["scan", "ai", "detect", "camera", "upload", "image"],
+      answer:
+      "Upload an image of the affected area. Our AI model analyzes it and gives you a prediction with confidence score. For best results, use good lighting and a clear image.",
+    ),
+    FAQItem(
+      title: "Is my data safe and private?",
+      icon: Icons.security,
+      keywords: ["privacy", "safe", "data", "secure", "information", "store"],
+      answer:
+      "Yes. Your images and chat history are stored locally on your device. We do not share your personal health data with any third party.",
+    ),
+    FAQItem(
+      title: "How to find a doctor?",
+      icon: Icons.local_hospital,
+      keywords: ["doctor", "find", "specialist", "oncologist", "hospital", "near"],
+      answer:
+      "Go to any cancer card like Breast, Lung, Skin, Uterine. Tap it and you’ll see a list of specialists with hospital, location, and contact number. You can also search by name.",
+    ),
+    FAQItem(
+      title: "Where can I see my scan history?",
+      icon: Icons.history,
+      keywords: ["history", "past", "report", "scan", "previous", "record"],
+      answer:
+      "Tap the History icon in the app. There you can view all past scans, results, confidence scores, and open detailed reports. You can also delete any scan.",
+    ),
+    FAQItem(
+      title: "Can AI replace a real doctor?",
+      icon: Icons.warning_amber,
+      keywords: ["doctor", "replace", "diagnosis", "real", "medical", "advice"],
+      answer:
+      "No. This app is for early screening and awareness only. AI results are not a final diagnosis. Always consult a certified oncologist for medical decisions.",
+    ),
+    FAQItem(
+      title: "What cancers can the app detect?",
+      icon: Icons.biotech,
+      keywords: ["cancer", "type", "detect", "support", "breast", "lung", "skin", "uterine"],
+      answer:
+      "Currently the app supports AI detection for Breast Cancer, Lung Cancer, Skin Cancer, and Uterine Cancer. More types will be added soon.",
+    ),
+    FAQItem(
+      title: "How accurate is the AI?",
+      icon: Icons.bar_chart,
+      keywords: ["accuracy", "accurate", "percent", "confidence", "reliable"],
+      answer:
+      "The AI shows a confidence score with every scan. Accuracy depends on image quality. It’s a screening tool, not 100% diagnostic. Use it with professional consultation.",
+    ),
+    FAQItem(
+      title: "How to download my report?",
+      icon: Icons.download,
+      keywords: ["download", "report", "pdf", "save", "export"],
+      answer:
+      "Open any scan from History. Tap 'View Report' and then use the download button on top to save the report to your device.",
+    ),
+    FAQItem(
+      title: "Why is my scan result 'Suspicious'?",
+      icon: Icons.report_problem,
+      keywords: ["suspicious", "result", "abnormal", "positive", "meaning"],
+      answer:
+      "'Suspicious' means the AI detected patterns that may need attention. Please book an appointment with a specialist immediately for further tests.",
+    ),
+    FAQItem(
+      title: "How to reset the chat?",
+      icon: Icons.refresh,
+      keywords: ["reset", "clear", "chat", "delete", "messages"],
+      answer:
+      "Tap the refresh icon at the top right of the chat screen. This will clear all chat messages.",
+    ),
+    FAQItem(
+      title: "Does the app work offline?",
+      icon: Icons.wifi_off,
+      keywords: ["offline", "internet", "no network", "without wifi"],
+      answer:
+      "Chat and viewing history works offline. But AI scanning and fetching latest doctor data requires internet connection.",
+    ),
+    FAQItem(
+      title: "How to use voice search?",
+      icon: Icons.mic,
+      keywords: ["voice", "speak", "mic", "talk", "speech"],
+      answer:
+      "Tap the mic icon in the chat bar and speak your question. The app will convert it to text and search for an answer.",
+    ),
+    FAQItem(
+      title: "What are the symptoms of Uterine Cancer?",
+      icon: Icons.pregnant_woman,
+      keywords: ["uterine", "symptoms", "bleeding", "pain", "period"],
+      answer:
+      "Common symptoms include abnormal vaginal bleeding, pelvic pain, and pain during intercourse. Early checkups are important. Use the Uterine Cancer card for specialist help.",
+    ),
+    FAQItem(
+      title: "How to contact support?",
+      icon: Icons.support_agent,
+      keywords: ["support", "contact", "help", "problem", "issue", "feedback"],
+      answer:
+      "For bugs or feedback, go to Settings > Contact Support. Our team will respond within 24 hours.",
+    ),
+    FAQItem(
+      title: "Can I add more doctors?",
+      icon: Icons.person_add,
+      keywords: ["add", "doctor", "list", "update", "new"],
+      answer:
+      "Doctor data is updated by the admin team. If you know a specialist missing from the list, use 'Contact Support' and share their details.",
     ),
   ];
 
@@ -98,11 +206,11 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
       }
     }
 
-    if (bestMatch != null && highestScore > 0) {
+    if (bestMatch!= null && highestScore > 0) {
       return bestMatch.answer;
     }
 
-    return "I couldn't find a direct match for that topic. Please ask about app usage, skin cancer, lung cancer, or breast cancer, or consult a certified medical provider for tailored advice.";
+    return "I couldn't find a direct match for that topic. Try asking about scans, doctors, privacy, history, or the 4 cancer types. Or consult a certified medical provider for tailored advice.";
   }
 
   void _listenVoice() async {
@@ -248,7 +356,6 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // Main Chat Area
               Expanded(
                 child: _messages.isEmpty
                     ? SingleChildScrollView(
@@ -286,7 +393,7 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
                     final msg = _messages[index];
                     final isUser = msg["sender"] == "user";
                     return Align(
-                      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: isUser? Alignment.centerRight : Alignment.centerLeft,
                       child: Container(
                         margin: const EdgeInsets.symmetric(vertical: 6),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -294,18 +401,18 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
                           maxWidth: MediaQuery.of(context).size.width * 0.80,
                         ),
                         decoration: BoxDecoration(
-                          color: isUser ? Colors.white : const Color(0xFF232142),
+                          color: isUser? Colors.white : const Color(0xFF232142),
                           borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
                             topRight: const Radius.circular(16),
-                            bottomLeft: Radius.circular(isUser ? 16 : 0),
-                            bottomRight: Radius.circular(isUser ? 0 : 16),
+                            bottomLeft: Radius.circular(isUser? 16 : 0),
+                            bottomRight: Radius.circular(isUser? 0 : 16),
                           ),
                         ),
                         child: Text(
-                          msg["text"] ?? "",
+                          msg["text"]?? "",
                           style: TextStyle(
-                            color: isUser ? Colors.black : Colors.white,
+                            color: isUser? Colors.black : Colors.white,
                             fontSize: 15,
                             height: 1.4,
                           ),
@@ -342,7 +449,7 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
                         controller: _messageController,
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                          hintText: _isListening ? "Listening..." : "Ask AI...",
+                          hintText: _isListening? "Listening..." : "Ask AI...",
                           hintStyle: const TextStyle(color: Colors.white60),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -352,8 +459,8 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
                     ),
                     IconButton(
                       icon: Icon(
-                        _isListening ? Icons.mic : Icons.mic_none,
-                        color: _isListening ? Colors.redAccent : Colors.white,
+                        _isListening? Icons.mic : Icons.mic_none,
+                        color: _isListening? Colors.redAccent : Colors.white,
                       ),
                       onPressed: _listenVoice,
                     ),
