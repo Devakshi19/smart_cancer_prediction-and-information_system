@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-  // Exact Lavender Color Palette
+  // Lavender Theme Palette
   static const Color primaryColor = Color(0xFF988AF1);
   static const Color darkTextColor = Color(0xFF231F40);
   static const Color subTextColor = Color(0xFF8E8CA3);
@@ -130,21 +130,26 @@ class _LoginPageState extends State<LoginPage> {
         GoogleAuthProvider googleProvider = GoogleAuthProvider();
         googleProvider.setCustomParameters({'prompt': 'select_account'});
         userCredential =
-        await FirebaseAuth.instance.signInWithPopup(googleProvider);
+            await FirebaseAuth.instance.signInWithPopup(googleProvider);
       } else {
-        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        final GoogleSignIn googleSignIn = GoogleSignIn(
+          serverClientId:
+              '573751912810-dvlfbkekspvtn2k1u7qeu8opf0fh5sus.apps.googleusercontent.com',
+          scopes: ['email', 'profile'],
+        );
+        final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
         if (googleUser == null) {
           if (mounted) setState(() => _isLoading = false);
           return;
         }
         final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+            await googleUser.authentication;
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
         userCredential =
-        await FirebaseAuth.instance.signInWithCredential(credential);
+            await FirebaseAuth.instance.signInWithCredential(credential);
       }
 
       User? user = userCredential.user;
@@ -199,9 +204,15 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
     } on FirebaseAuthException catch (e) {
-      _showSnackBar(e.message ?? "Google Sign-In Failed", Colors.redAccent);
+      debugPrint("FirebaseAuthException during Google Sign-In: ${e.code} - ${e.message}");
+      _showSnackBar(e.message ?? "Google Sign-In Failed (${e.code})", Colors.redAccent);
     } catch (e) {
-      _showSnackBar("Google Sign-In Error: $e", Colors.redAccent);
+      debugPrint("Detailed Google Sign-In Exception: $e");
+      String errorMsg = e.toString();
+      if (errorMsg.contains("10") || errorMsg.contains("DeveloperError") || errorMsg.contains("ApiException: 10")) {
+        errorMsg = "Google Sign-In requires SHA-1 fingerprint in Firebase Console. Please use Email/Password login or add SHA-1 to Firebase.";
+      }
+      _showSnackBar(errorMsg, Colors.redAccent);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -249,7 +260,7 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      "Please check your SPAM, JUNK, or PROMOTIONS folder if you cannot find the verification link.",
+                      "Please check your SPAM or PROMOTIONS folder if you cannot find the link.",
                       style: TextStyle(
                         fontSize: 12,
                         color: darkTextColor,
@@ -259,11 +270,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              "Click the link inside that email to enable your account, then try logging in again.",
-              style: TextStyle(fontSize: 13, color: subTextColor),
             ),
           ],
         ),
@@ -331,7 +337,6 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Top Circle Icon Badge
               Center(
                 child: Container(
                   width: 88,
@@ -357,7 +362,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
 
-              // Header Titles
               const Text(
                 "Welcome Back",
                 textAlign: TextAlign.center,
@@ -378,7 +382,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 28),
 
-              // White Form Card
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
@@ -410,11 +413,6 @@ class _LoginPageState extends State<LoginPage> {
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
-                        floatingLabelStyle: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
                         prefixIcon: const Icon(
                           Icons.email_outlined,
                           color: primaryColor,
@@ -429,17 +427,6 @@ class _LoginPageState extends State<LoginPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(
-                            color: primaryColor,
-                            width: 1.5,
-                          ),
                         ),
                       ),
                     ),
@@ -458,11 +445,6 @@ class _LoginPageState extends State<LoginPage> {
                           color: Colors.black87,
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
-                        ),
-                        floatingLabelStyle: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
                         ),
                         prefixIcon: const Icon(
                           Icons.lock_outline_rounded,
@@ -492,17 +474,6 @@ class _LoginPageState extends State<LoginPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(
-                            color: primaryColor,
-                            width: 1.5,
-                          ),
                         ),
                       ),
                     ),
