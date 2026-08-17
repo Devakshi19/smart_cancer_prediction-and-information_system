@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -115,24 +116,25 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await Firebase.initializeApp();
-  } catch (e) {
-    debugPrint("Native Firebase init error, falling back to options: $e");
-    try {
-      await Firebase.initializeApp(
-        options: const FirebaseOptions(
-          apiKey: "AIzaSyBUn8czg17vM8Jp4elyJdus10vs5TX9Ky0",
-          authDomain: "cancer-detection-app-4a51a.firebaseapp.com",
-          projectId: "cancer-detection-app-4a51a",
-          storageBucket: "cancer-detection-app-4a51a.firebasestorage.app",
-          messagingSenderId: "573751912810",
-          appId: "1:573751912810:web:2842a33e953e529e079d13",
-          measurementId: "G-7702EMXK8C",
-        ),
-      );
-    } catch (e2) {
-      debugPrint("Firebase initialization error: $e2");
+    if (Firebase.apps.isEmpty) {
+      if (kIsWeb) {
+        await Firebase.initializeApp(
+          options: const FirebaseOptions(
+            apiKey: "AIzaSyBUn8czg17vM8Jp4elyJdus10vs5TX9Ky0",
+            authDomain: "cancer-detection-app-4a51a.firebaseapp.com",
+            projectId: "cancer-detection-app-4a51a",
+            storageBucket: "cancer-detection-app-4a51a.firebasestorage.app",
+            messagingSenderId: "573751912810",
+            appId: "1:573751912810:web:2842a33e953e529e079d13",
+            measurementId: "G-7702EMXK8C",
+          ),
+        );
+      } else {
+        await Firebase.initializeApp();
+      }
     }
+  } catch (e) {
+    debugPrint("Firebase initialization error: $e");
   }
 
   await AppState.init();
@@ -272,7 +274,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const SkinCancerScanPage(),
+                      builder: (context) => const ScanPage(initialCategory: 'Skin'),
                     ),
                   );
                 },
@@ -287,7 +289,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const LungCancerScanPage(),
+                      builder: (context) => const ScanPage(initialCategory: 'Lung'),
                     ),
                   );
                 },
@@ -301,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const BreastCancerScanPage(),
+                      builder: (context) => const ScanPage(initialCategory: 'Breast'),
                     ),
                   );
                 },
@@ -316,7 +318,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const UterineCancerScanPage(),
+                      builder: (context) => const ScanPage(initialCategory: 'Uterine'),
                     ),
                   );
                 },
