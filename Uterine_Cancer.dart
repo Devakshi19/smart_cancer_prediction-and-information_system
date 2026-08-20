@@ -327,12 +327,6 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xFFC084FC),
-        icon: const Icon(Icons.document_scanner_outlined, color: Colors.white),
-        label: const Text(
-          "AI Scan Pelvic US / Biopsy",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
         onPressed: () {
           Navigator.push(
             context,
@@ -341,6 +335,15 @@ class _UterineCancerDetailsPageState extends State<UterineCancerDetailsPage> {
             ),
           );
         },
+        backgroundColor: const Color(0xFF9A95E8),
+        icon: const Icon(Icons.document_scanner, color: Colors.white),
+        label: const Text(
+          "AI Scan Pelvic US / Biopsy",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
