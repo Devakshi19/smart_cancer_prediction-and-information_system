@@ -330,12 +330,6 @@ class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xFFC084FC),
-        icon: const Icon(Icons.center_focus_weak_rounded, color: Colors.white),
-        label: const Text(
-          "AI Scan Skin Lesion",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
         onPressed: () {
           Navigator.push(
             context,
@@ -344,6 +338,15 @@ class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
             ),
           );
         },
+        backgroundColor: const Color(0xFF9A95E8),
+        icon: const Icon(Icons.document_scanner, color: Colors.white),
+        label: const Text(
+          "AI Scan Skin Lesion",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
