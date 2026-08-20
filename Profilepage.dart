@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'editprofile.dart';
 import 'user_session.dart';
 
-
 class ProfilePage extends StatefulWidget {
   final Map<String, dynamic>? userData;
   const ProfilePage({super.key, this.userData});
@@ -69,11 +68,6 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            const CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage("assets/profile.png"),
-            ),
-            const SizedBox(height: 10),
             Text(
               name,
               style: const TextStyle(
@@ -135,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       phone: phone,
                       age: age,
                       weight: weight,
-                      height: height,
+                      height: height, gender: '',
                     ),
                   ),
                 );
