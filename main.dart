@@ -40,6 +40,9 @@ class AppState {
 
   static Future<void> init() async {
     await ThemeManager.instance.loadTheme();
+    final prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('selectedLanguage') ?? 'English';
+    languageNotifier.value = lang;
   }
 
   static void toggleTheme(bool isDark) {
@@ -197,10 +200,37 @@ class _HomePageState extends State<HomePage> {
   String currentUserName = "Cancer Detection App";
   String currentUserEmail = "AI-Based Cancer Detection";
 
+  String _totalScansStr = '00';
+  String _activeScansStr = '00';
+  String _lastScanDateStr = '--';
+
   @override
   void initState() {
     super.initState();
     _loadDrawerUserData();
+    _loadDashboardStats();
+    ScanService.scanUpdatesNotifier.addListener(_loadDashboardStats);
+  }
+
+  @override
+  void dispose() {
+    ScanService.scanUpdatesNotifier.removeListener(_loadDashboardStats);
+    super.dispose();
+  }
+
+  Future<void> _loadDashboardStats() async {
+    try {
+      final stats = await ScanService.getDashboardStats();
+      if (mounted) {
+        setState(() {
+          _totalScansStr = stats['total'] ?? '00';
+          _activeScansStr = stats['active'] ?? '00';
+          _lastScanDateStr = stats['last'] ?? '--';
+        });
+      }
+    } catch (e) {
+      debugPrint("Error loading dashboard stats: $e");
+    }
   }
 
   Future<void> _loadDrawerUserData() async {
@@ -214,27 +244,51 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Widget _buildQuickStatItem(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, color: const Color(0xFF9A95E8), size: 22),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+  Widget _buildQuickStatItem(
+      String label,
+      String value,
+      IconData icon, {
+        VoidCallback? onTap,
+      }) {
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Column(
+              children: [
+                Icon(icon, color: const Color(0xFF9A95E8), size: 22),
+                const SizedBox(height: 6),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey,
+                    ),
+                    maxLines: 1,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 11,
-            color: Colors.grey,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -242,7 +296,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       height: 35,
       width: 1,
-      color: Colors.grey.withOpacity(0.2),
+      color: Theme.of(context).dividerColor.withOpacity(0.2),
     );
   }
 
@@ -253,77 +307,81 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (modalContext) {
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Select Cancer AI Detection Type",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        return SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Select Cancer AI Detection Type",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 15),
+                  ListTile(
+                    leading:
+                    const Icon(Icons.clean_hands, color: Color(0xFF9A95E8)),
+                    title: const Text("Skin Cancer Detection"),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.pop(modalContext);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ScanPage(initialCategory: 'Skin'),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.personal_injury,
+                        color: Color(0xFF9A95E8)),
+                    title: const Text("Lung Cancer (Chest X-Ray)"),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.pop(modalContext);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ScanPage(initialCategory: 'Lung'),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.female, color: Color(0xFF9A95E8)),
+                    title: const Text("Breast Cancer Detection"),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.pop(modalContext);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ScanPage(initialCategory: 'Breast'),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.health_and_safety,
+                        color: Color(0xFF9A95E8)),
+                    title: const Text("Uterine Cancer Detection"),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.pop(modalContext);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ScanPage(initialCategory: 'Uterine'),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 15),
-              ListTile(
-                leading:
-                const Icon(Icons.clean_hands, color: Color(0xFF9A95E8)),
-                title: const Text("Skin Cancer Detection"),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                onTap: () {
-                  Navigator.pop(modalContext);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ScanPage(initialCategory: 'Skin'),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.personal_injury,
-                    color: Color(0xFF9A95E8)),
-                title: const Text("Lung Cancer (Chest X-Ray)"),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                onTap: () {
-                  Navigator.pop(modalContext);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ScanPage(initialCategory: 'Lung'),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.female, color: Color(0xFF9A95E8)),
-                title: const Text("Breast Cancer Detection"),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                onTap: () {
-                  Navigator.pop(modalContext);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ScanPage(initialCategory: 'Breast'),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.health_and_safety,
-                    color: Color(0xFF9A95E8)),
-                title: const Text("Uterine Cancer Detection"),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                onTap: () {
-                  Navigator.pop(modalContext);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ScanPage(initialCategory: 'Uterine'),
-                    ),
-                  );
-                },
-              ),
-            ],
+            ),
           ),
         );
       },
@@ -352,43 +410,31 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Hello, ${currentUserName.split(' ')[0]} 👋",
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Hello, ${currentUserName.split(' ')[0]} 👋",
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "Your health is our top priority",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
+                      const SizedBox(height: 4),
+                      const Text(
+                        "Your health is our top priority",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFF9A95E8),
-                        width: 2.0,
-                      ),
-                    ),
-                    child: const CircleAvatar(
-                      radius: 22,
-                      backgroundImage: AssetImage("assets/profile.png"),
-                    ),
+                    ],
                   ),
                 ),
               ],
@@ -424,14 +470,19 @@ class _HomePageState extends State<HomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "AI Screening Dashboard",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF9A95E8),
+                      const Expanded(
+                        child: Text(
+                          "AI Screening Dashboard",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF9A95E8),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
@@ -440,12 +491,13 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.check_circle,
                                 size: 14, color: Color(0xFF9A95E8)),
                             SizedBox(width: 4),
                             Text(
-                              "Connected",
+                              "Live Sync",
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -462,13 +514,37 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _buildQuickStatItem(
-                          "Total Scans", "08", Icons.analytics_outlined),
+                        "Total Scans",
+                        _totalScansStr,
+                        Icons.analytics_outlined,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HistoryPage()),
+                          );
+                        },
+                      ),
                       _buildQuickStatDivider(),
                       _buildQuickStatItem(
-                          "Active Scans", "00", Icons.play_circle_outline),
+                        "Active Scans",
+                        _activeScansStr,
+                        Icons.play_circle_outline,
+                        onTap: () {
+                          _showQuickScanModal(context);
+                        },
+                      ),
                       _buildQuickStatDivider(),
                       _buildQuickStatItem(
-                          "Last Scan", "12 July", Icons.calendar_today_outlined),
+                        "Last Scan",
+                        _lastScanDateStr,
+                        Icons.calendar_today_outlined,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HistoryPage()),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ],
