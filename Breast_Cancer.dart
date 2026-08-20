@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart'; // ADD THIS
+import '../screens/scan_pages.dart';
 
 class BreastCancerCard extends StatelessWidget {
   const BreastCancerCard({super.key});
@@ -32,7 +33,7 @@ class BreastCancerCard extends StatelessWidget {
           );
         },
         child: Container(
-          height: 180,
+          height: 190,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             gradient: const LinearGradient(
@@ -57,74 +58,67 @@ class BreastCancerCard extends StatelessWidget {
               Positioned(
                 right: -10,
                 bottom: -10,
-                child: Opacity(
-                  opacity: 0.15,
-                  child: Image.asset(
-                    'assets/images/breast_cancer_icon.png',
-                    width: 120,
-                    height: 120,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(
-                        Icons.air,
-                        size: 120,
-                        color: Colors.white,
-                      );
-                    },
-                  ),
+                child: Icon(
+                  Icons.favorite,
+                  size: 120,
+                  color: Colors.white.withValues(alpha: 0.15),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Breast Cancer",
-                      style: TextStyle(
-                        fontSize: 27,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Breast Cancer",
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          "Mammogram Based AI Detection",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 15,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      "Mammogram Based AI Detection",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const Spacer(),
                     Row(
                       children: [
-                        Image.asset(
-                          'assets/images/ai_bot.png',
-                          width: 24,
-                          height: 24,
-                          color: Colors.white,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.smart_toy, color: Colors.white),
-                        ),
+                        const Icon(Icons.smart_toy, color: Colors.white, size: 20),
                         const SizedBox(width: 8),
-                        const Text(
-                          "AI Detection",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                        const Expanded(
+                          child: Text(
+                            "AI Detection",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
                           ),
                         ),
-                        const Spacer(),
                         Container(
-                          height: 38,
-                          width: 38,
+                          height: 36,
+                          width: 36,
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.arrow_forward_ios,
-                            size: 18,
+                            size: 16,
                             color: Color(0xFF9A95E8),
                           ),
                         ),
@@ -330,6 +324,25 @@ class _BreastCancerDetailsPageState extends State<BreastCancerDetailsPage> {
               ),
             ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ScanPage(initialCategory: 'Breast'),
+            ),
+          );
+        },
+        backgroundColor: const Color(0xFF9A95E8),
+        icon: const Icon(Icons.document_scanner, color: Colors.white),
+        label: const Text(
+          "AI Scan Mammogram / US",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
