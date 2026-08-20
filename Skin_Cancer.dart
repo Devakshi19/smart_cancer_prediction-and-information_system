@@ -33,7 +33,7 @@ class SkinCancerCard extends StatelessWidget {
           );
         },
         child: Container(
-          height: 180,
+          height: 190,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             gradient: const LinearGradient(
@@ -65,52 +65,64 @@ class SkinCancerCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Skin Cancer",
-                      style: TextStyle(
-                        fontSize: 27,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Skin Cancer",
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          "Skin Cancer AI Detection",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 15,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      "Skin Cancer AI Detection",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const Spacer(),
                     Row(
                       children: [
                         const Icon(
                           Icons.smart_toy,
                           color: Colors.white,
+                          size: 20,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          "AI Detection",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                        const Expanded(
+                          child: Text(
+                            "AI Detection",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
                           ),
                         ),
-                        const Spacer(),
                         Container(
-                          height: 38,
-                          width: 38,
+                          height: 36,
+                          width: 36,
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.arrow_forward_ios,
-                            size: 18,
+                            size: 16,
                             color: Color(0xFF9A95E8),
                           ),
                         ),
