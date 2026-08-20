@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart'; // ADD THIS
+import 'package:url_launcher/url_launcher.dart';
+
+import '../screens/scan_pages.dart'; // ADD THIS
 
 
 class SkinCancerCard extends StatelessWidget {
@@ -326,6 +328,22 @@ class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFFC084FC),
+        icon: const Icon(Icons.center_focus_weak_rounded, color: Colors.white),
+        label: const Text(
+          "AI Scan Skin Lesion",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ScanPage(initialCategory: 'Skin'),
+            ),
+          );
+        },
       ),
     );
   }
