@@ -7,6 +7,9 @@ import 'historypage.dart';
 
 class ScanService {
   static const String _localScansKey = 'user_scan_history_records';
+  
+  /// Global notifier to notify UI widgets (like AI Screening Dashboard) when scans change
+  static final ValueNotifier<int> scanUpdatesNotifier = ValueNotifier<int>(0);
 
   /// Save a new scan record to user's Cloud Firestore account & local cache
   static Future<void> saveScanRecord({
@@ -14,6 +17,8 @@ class ScanService {
     required String result,
     required double confidence,
     String? imageUrl,
+    required dynamic summary,
+    required dynamic diagnosis,
   }) async {
     final now = DateTime.now();
     final String scanId = 'scan_${now.millisecondsSinceEpoch}';
@@ -65,6 +70,75 @@ class ScanService {
     } catch (e) {
       debugPrint("Local scan save error: $e");
     }
+
+    // Notify listeners that a new scan was recorded
+    scanUpdatesNotifier.value++;
+  }
+
+  /// Compute dynamic real-time stats for the Home AI Screening Dashboard
+  static Future<Map<String, String>> getDashboardStats() async {
+    final scans = await getUserScans();
+
+    // 1. Total Scans (formatted with leading zero if single digit)
+    final int totalCount = scans.length;
+    final String totalStr = totalCount < 10 ? '0$totalCount' : '$totalCount';
+
+    // 2. Active Scans (scans recorded today)
+    final now = DateTime.now();
+    int scansToday = 0;
+    for (var scan in scans) {
+      if (scan.timestamp != null) {
+        final scanDate = DateTime.fromMillisecondsSinceEpoch(scan.timestamp!);
+        if (scanDate.year == now.year &&
+            scanDate.month == now.month &&
+            scanDate.day == now.day) {
+          scansToday++;
+        }
+      } else if (scan.date.toLowerCase().contains('today') ||
+          scan.date.startsWith('${now.day} ${_monthName(now.month)} ${now.year}')) {
+        scansToday++;
+      }
+    }
+    final String activeStr = scansToday < 10 ? '0$scansToday' : '$scansToday';
+
+    // 3. Last Scan Date
+    String lastScanStr = '--';
+    if (scans.isNotEmpty) {
+      final latest = scans.first;
+      if (latest.timestamp != null) {
+        final latestDate = DateTime.fromMillisecondsSinceEpoch(latest.timestamp!);
+        final today = DateTime(now.year, now.month, now.day);
+        final scanDay = DateTime(latestDate.year, latestDate.month, latestDate.day);
+        final diffDays = today.difference(scanDay).inDays;
+
+        if (diffDays == 0) {
+          lastScanStr = 'Today';
+        } else if (diffDays == 1) {
+          lastScanStr = 'Yesterday';
+        } else if (diffDays < 7) {
+          lastScanStr = '$diffDays days ago';
+        } else {
+          lastScanStr = '${latestDate.day} ${_monthName(latestDate.month)}';
+        }
+      } else {
+        if (latest.date.toLowerCase().contains('today')) {
+          lastScanStr = 'Today';
+        } else {
+          final parts = latest.date.split(' ');
+          if (parts.length >= 2) {
+            lastScanStr = '${parts[0]} ${parts[1]}';
+          } else {
+            lastScanStr = latest.date;
+          }
+        }
+      }
+    }
+
+    return {
+      'total': totalStr,
+      'active': activeStr,
+      'last': lastScanStr,
+    };
   }
 
   /// Fetch all scan records for current user (combining Firestore + Local + Defaults)
@@ -150,6 +224,8 @@ class ScanService {
     } catch (e) {
       debugPrint("Local delete error: $e");
     }
+
+    scanUpdatesNotifier.value++;
   }
 
   static String _monthName(int month) {
