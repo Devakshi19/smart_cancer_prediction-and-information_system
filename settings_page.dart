@@ -83,7 +83,6 @@ class _SettingsPageState extends State<SettingsPage> {
               setState(() {
                 _isDarkMode = value;
               });
-              // Triggers global theme change through AppState & ThemeManager
               AppState.toggleTheme(value);
             },
           ),
