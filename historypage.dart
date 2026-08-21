@@ -164,7 +164,6 @@ class _HistoryPageState extends State<HistoryPage> {
                     ],
                   ),
 
-              // Uploaded Image Display in Report Modal
               if (scan.imageUrl != null && scan.imageUrl!.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 ClipRRect(
@@ -338,7 +337,6 @@ class _HistoryPageState extends State<HistoryPage> {
             ),
           ),
 
-          // Scan Records List
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             sliver: SliverList(
