@@ -19,11 +19,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
   bool _isLoading = false;
   bool _obscurePassword = true;
-
-  // Lavender Theme Palette
   static const Color primaryColor = Color(0xFF988AF1);
   static const Color darkTextColor = Color(0xFF231F40);
   static const Color subTextColor = Color(0xFF8E8CA3);
@@ -40,17 +37,14 @@ class _LoginPageState extends State<LoginPage> {
   void _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-
     if (email.isEmpty || password.isEmpty) {
       _showSnackBar("Please enter both email and password.", Colors.redAccent);
       return;
     }
-
     if (!_isValidEmail(email)) {
       _showSnackBar("Please enter a valid email address.", Colors.redAccent);
       return;
     }
-
     setState(() => _isLoading = true);
 
     try {
@@ -62,12 +56,10 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       User? user = userCredential.user;
-
       if (user != null) {
         if (!user.emailVerified) {
           await FirebaseAuth.instance.signOut();
           if (!mounted) return;
-
           _showEmailUnverifiedDialog(user);
           return;
         }
@@ -594,8 +586,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 28),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   const Text(
                     "Don't have an account? ",
