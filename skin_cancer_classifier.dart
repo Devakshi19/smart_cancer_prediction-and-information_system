@@ -21,20 +21,15 @@ class SkinClassifierService {
     return expV.map((v) => v / sumExp).toList();
   }
 
-  /// Analyze from a File (mobile)
   static Future<Map<String, dynamic>> analyzeSkinImage(File imageFile) async {
     final rawBytes = await imageFile.readAsBytes();
     return _analyzeBytes(rawBytes);
   }
 
-  /// Analyze from raw bytes (web)
   static Future<Map<String, dynamic>> analyzeSkinImageBytes(Uint8List rawBytes) async {
     return _analyzeBytes(rawBytes);
   }
 
-  /// 100% DETERMINISTIC skin cancer analysis with strict non-skin rejection.
-  /// Uses pixel quantization to eliminate JPEG re-compression noise.
-  /// Uses color diversity + edge density + saturation checks to reject posters/graphics.
   static Map<String, dynamic> _analyzeBytes(Uint8List rawBytes) {
     final img.Image? decoded = img.decodeImage(rawBytes);
     if (decoded == null) {
@@ -45,15 +40,8 @@ class SkinClassifierService {
       };
     }
 
-    // ================================================================
-    // STEP 0: DETERMINISTIC PREPROCESSING
-    // Resize to fixed 128x128, then QUANTIZE to 64 discrete levels.
-    // This eliminates JPEG re-compression differences (±2 pixel values).
-    // ================================================================
     final img.Image thumb = img.copyResize(decoded, width: 128, height: 128);
     final int totalPixels = thumb.width * thumb.height;
-
-    // Extract and quantize all pixel data
     List<double> allR = [];
     List<double> allG = [];
     List<double> allB = [];
@@ -61,16 +49,12 @@ class SkinClassifierService {
     for (int y = 0; y < thumb.height; y++) {
       for (int x = 0; x < thumb.width; x++) {
         final pixel = thumb.getPixel(x, y);
-        // Quantize to 64 levels: round(val/255 * 64) / 64
         allR.add((pixel.r / 255.0 * 64.0).roundToDouble() / 64.0);
         allG.add((pixel.g / 255.0 * 64.0).roundToDouble() / 64.0);
         allB.add((pixel.b / 255.0 * 64.0).roundToDouble() / 64.0);
       }
     }
 
-    // ================================================================
-    // STEP 1: HUMAN SKIN TISSUE DETECTION (RGB + HSV rules)
-    // ================================================================
     int skinPixels = 0;
     int unnaturalPixels = 0;
     Set<int> hueBins = {};
@@ -79,7 +63,6 @@ class SkinClassifierService {
     List<double> satValues = [];
     List<double> grayValues = [];
 
-    // Border region detection
     int pad = (128 * 0.12).ceil();
     if (pad < 6) pad = 6;
     List<double> borderR = [];
@@ -93,7 +76,6 @@ class SkinClassifierService {
       double gray = 0.299 * r + 0.587 * g + 0.114 * b;
       grayValues.add(gray);
 
-      // HSV calculation
       double maxC = math.max(r, math.max(g, b));
       double minC = math.min(r, math.min(g, b));
       double delta = maxC - minC + 1e-7;
@@ -109,33 +91,13 @@ class SkinClassifierService {
       if (hue < 0) hue += 360.0;
 
       double sat = delta / (maxC + 1e-7);
-      satValues.add(sat);
+      bool rgbSkin = (r > g) && (g >= b * 0.70) &&
+          ((r - g) >= 0.03) && ((r - b) >= 0.05) &&
+          ((r + g + b) > 0.25) && ((r + g + b) < 2.80);
 
-      // RGB skin rule
-      bool rgbSkin = (r > g) && (g >= b * 0.75) &&
-          ((r - g) >= 0.04) && ((r - b) >= 0.06) &&
-          ((r + g + b) > 0.30) && ((r + g + b) < 2.75);
-
-      // HSV skin rule
-      bool hsvSkin = ((hue <= 40.0) || (hue >= 335.0)) &&
-          (sat >= 0.10) && (sat <= 0.70) &&
-          (maxC >= 0.20) && (maxC <= 0.96);
-
-      if (rgbSkin && hsvSkin) skinPixels++;
-
-      // Non-skin colors
-      bool isUnnatural = ((hue > 55.0) && (hue < 320.0) && (sat > 0.18)) ||
-          (sat > 0.75) ||
-          (r < 0.08 && g < 0.08 && b < 0.08) ||
-          (r > 0.95 && g > 0.95 && b > 0.95);
-      if (isUnnatural) unnaturalPixels++;
-
-      // Hue bin for color diversity (only chromatically significant pixels)
-      if (sat > 0.12) {
-        hueBins.add((hue / 20.0).floor());
-      }
-
-      // Border pixels
+      if (rgbSkin) skinPixels++;
+      bool isNonSkinHue = (hue > 60.0) && (hue < 310.0) && (sat > 0.15);
+      if (isNonSkinHue) unnaturalPixels++;
       int py = i ~/ 128;
       int px = i % 128;
       if (py < pad || py >= (128 - pad) || px < pad || px >= (128 - pad)) {
@@ -145,24 +107,20 @@ class SkinClassifierService {
       }
     }
 
-    // Edge density calculation
     for (int y = 0; y < 127; y++) {
       for (int x = 0; x < 127; x++) {
         int idx = y * 128 + x;
         double edgeY = (grayValues[idx + 128] - grayValues[idx]).abs();
         double edgeX = (grayValues[idx + 1] - grayValues[idx]).abs();
-        if (edgeY > 0.12) strongEdges++;
-        if (edgeX > 0.12) strongEdges++;
+        if (edgeY > 0.15) strongEdges++;
+        if (edgeX > 0.15) strongEdges++;
         edgeCount += 2;
       }
     }
 
     double skinRatio = skinPixels / totalPixels.toDouble();
-    double unnaturalRatio = unnaturalPixels / totalPixels.toDouble();
+    double nonSkinRatio = unnaturalPixels / totalPixels.toDouble();
     double edgeDensity = edgeCount > 0 ? strongEdges / edgeCount.toDouble() : 0;
-    int uniqueHueBins = hueBins.length;
-
-    // Border variance
     double borderStd = 0;
     if (borderR.isNotEmpty) {
       double brStd = _stdDev(borderR);
@@ -171,21 +129,12 @@ class SkinClassifierService {
       borderStd = (brStd + bgStd + bbStd) / 3.0;
     }
 
-    // ================================================================
-    // REJECTION DECISION (must pass ALL):
-    //   1. skinRatio >= 0.45
-    //   2. uniqueHueBins <= 8
-    //   3. edgeDensity <= 0.15
-    //   4. unnaturalRatio <= 0.22
-    //   5. borderStd <= 0.20
-    // ================================================================
-    bool rejected = (skinRatio < 0.45) ||
-        (uniqueHueBins > 8) ||
-        (edgeDensity > 0.15) ||
-        (unnaturalRatio > 0.22) ||
-        (borderStd > 0.20);
+    final bool isValidSkin = (skinRatio >= 0.35) &&
+        (nonSkinRatio <= 0.08) &&
+        (edgeDensity <= 0.18) &&
+        (borderStd <= 0.25);
 
-    if (rejected) {
+    if (!isValidSkin) {
       return {
         'success': false,
         'is_valid_skin': false,
@@ -197,11 +146,6 @@ class SkinClassifierService {
       };
     }
 
-    // ================================================================
-    // STEP 3: DETERMINISTIC ABCDE FEATURE EXTRACTION
-    // ================================================================
-
-    // Find median gray of border skin pixels for lesion segmentation
     List<double> borderSkinGray = [];
     for (int i = 0; i < totalPixels; i++) {
       int py = i ~/ 128;
@@ -219,14 +163,12 @@ class SkinClassifierService {
         ? _median(borderSkinGray)
         : _median(grayValues);
 
-    // Lesion mask
     List<bool> lesionMask = List.filled(totalPixels, false);
     double threshold = 0.05;
     List<double> diffs = grayValues.map((g) => bgBrightness - g).toList();
     diffs.sort();
     double p75 = diffs[(diffs.length * 0.75).floor()];
     threshold = math.max(0.05, p75 * 0.45);
-
     int lesionCount = 0;
     for (int i = 0; i < totalPixels; i++) {
       if (bgBrightness - grayValues[i] > threshold) {
@@ -257,7 +199,6 @@ class SkinClassifierService {
       }
     }
 
-    // A: Asymmetry
     double topH = 0, botH = 0, leftH = 0, rightH = 0;
     for (int i = 0; i < totalPixels; i++) {
       if (!lesionMask[i]) continue;
@@ -270,13 +211,11 @@ class SkinClassifierService {
     double hAsym = (leftH - rightH).abs() / math.max(1.0, leftH + rightH);
     double asymmetry = _round4(math.min(1.0, (vAsym + hAsym) * 1.25));
 
-    // B: Border Irregularity (simplified compactness)
     int perimeterPixels = 0;
     for (int i = 0; i < totalPixels; i++) {
       if (!lesionMask[i]) continue;
       int py = i ~/ 128;
       int px = i % 128;
-      // Check if any neighbor is not lesion
       bool isEdge = false;
       if (py == 0 || py == 127 || px == 0 || px == 127) {
         isEdge = true;
@@ -291,8 +230,6 @@ class SkinClassifierService {
     double compactness = (perimeterPixels.toDouble() * perimeterPixels.toDouble()) /
         (4.0 * math.pi * math.max(1.0, lesionCount.toDouble()));
     double border = _round4(math.min(1.0, math.max(0.0, (compactness - 1.0) / 4.2)));
-
-    // C: Color Variegation
     List<double> lR = [], lG = [], lB = [], lGray = [];
     for (int i = 0; i < totalPixels; i++) {
       if (lesionMask[i]) {
@@ -309,11 +246,7 @@ class SkinClassifierService {
     double darkRatio = _round4(lGray.isNotEmpty
         ? lGray.where((v) => v < 0.28).length / lGray.length.toDouble()
         : 0.0);
-
-    // D: Diameter
     double diameter = _round4(math.min(1.0, (lesionCount / totalPixels.toDouble()) * 4.2));
-
-    // E: Texture
     double totalEdgeY = 0, totalEdgeX = 0;
     int ey = 0, ex = 0;
     for (int y = 0; y < 127; y++) {
@@ -330,10 +263,6 @@ class SkinClassifierService {
     }
     double texture = _round4(math.min(1.0,
         ((ey > 0 ? totalEdgeY / ey : 0) + (ex > 0 ? totalEdgeX / ex : 0)) * 6.0));
-
-    // ================================================================
-    // STEP 4: DETERMINISTIC CANCER RISK
-    // ================================================================
     double malignancy = _round4(
         0.30 * asymmetry +
         0.25 * border +
