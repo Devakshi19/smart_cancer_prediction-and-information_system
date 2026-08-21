@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart'; // FOR CALLING
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({Key? key}) : super(key: key);
 
-  // FUNCTION TO DIAL NUMBER
   Future<void> _dialNumber(BuildContext context, String number) async {
     final Uri phoneUri = Uri(scheme: 'tel', path: number);
     if (await canLaunchUrl(phoneUri)) {
@@ -21,20 +20,13 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primaryColor = const Color(0xFF8C80E8);
-
-    // Detect current theme
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // Colors according to theme
     final backgroundColor =
     isDark ? const Color(0xFF121212) : const Color(0xFFF7F7FA);
-
     final cardColor =
     isDark ? const Color(0xFF1E1E1E) : Colors.white;
-
     final textColor =
     isDark ? Colors.white : Colors.black;
-
     final secondaryTextColor =
     isDark ? Colors.grey.shade400 : Colors.grey;
 
@@ -57,7 +49,6 @@ class AboutPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ================= OUR MISSION =================
             _buildSectionCard(
               cardColor: cardColor,
               child: Column(
@@ -96,8 +87,6 @@ class AboutPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-
-            // ================= STAT CARDS =================
             Row(
               children: [
                 Expanded(
@@ -138,8 +127,6 @@ class AboutPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-
-            // ================= KEY CAPABILITIES =================
             Text(
               "Key Capabilities",
               style: TextStyle(
@@ -149,7 +136,6 @@ class AboutPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-
             _buildFeatureTile(
               icon: Icons.psychology_outlined,
               title: "Multi-Model AI Screening",
@@ -184,8 +170,6 @@ class AboutPage extends StatelessWidget {
               isDark: isDark,
             ),
             const SizedBox(height: 16),
-
-            // ================= MEDICAL DISCLAIMER =================
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -234,8 +218,6 @@ class AboutPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-
-            // ================= IMMEDIATE HELP =================
             _buildSectionCard(
               cardColor: cardColor,
               child: Column(
@@ -288,9 +270,6 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  // ============================================================
-  // SECTION CARD
-  // ============================================================
   Widget _buildSectionCard({
     required Widget child,
     required Color cardColor,
@@ -313,9 +292,6 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  // ============================================================
-  // STAT CARD
-  // ============================================================
   Widget _buildStatCard(
       String value,
       String label,
@@ -368,9 +344,6 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  // ============================================================
-  // FEATURE TILE
-  // ============================================================
   Widget _buildFeatureTile({
     required IconData icon,
     required String title,
