@@ -1,21 +1,18 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 class BreastClassifierService {
-  /// Analyze from File (mobile)
   static Future<Map<String, dynamic>> analyzeBreastImage(File imageFile) async {
     final rawBytes = await imageFile.readAsBytes();
     return _analyzeBytes(rawBytes);
   }
 
-  /// Analyze from raw bytes (web)
   static Future<Map<String, dynamic>> analyzeBreastImageBytes(Uint8List rawBytes) async {
     return _analyzeBytes(rawBytes);
   }
 
-  /// 100% Deterministic on-device radiologic analysis for Mammograms and Breast Ultrasounds.
   static Map<String, dynamic> _analyzeBytes(Uint8List rawBytes) {
     final img.Image? decoded = img.decodeImage(rawBytes);
     if (decoded == null) {
@@ -27,7 +24,6 @@ class BreastClassifierService {
       };
     }
 
-    // Step 0: Resize and Quantize to eliminate JPEG compression variance
     final img.Image thumb = img.copyResize(decoded, width: 128, height: 128);
     final int totalPixels = thumb.width * thumb.height;
 
@@ -35,7 +31,6 @@ class BreastClassifierService {
     List<double> allG = [];
     List<double> allB = [];
     List<double> grayValues = [];
-
     int monoPixels = 0;
 
     for (int y = 0; y < thumb.height; y++) {
@@ -59,14 +54,11 @@ class BreastClassifierService {
     }
 
     double monoRatio = monoPixels / totalPixels.toDouble();
-
-    // Dynamic range
     List<double> sortedGray = List.from(grayValues)..sort();
     double p5 = sortedGray[(sortedGray.length * 0.05).floor()];
     double p95 = sortedGray[(sortedGray.length * 0.95).floor()];
     double contrastRange = p95 - p5;
 
-    // Edge density
     int strongEdges = 0;
     int edgeCount = 0;
     for (int y = 0; y < 127; y++) {
@@ -80,8 +72,6 @@ class BreastClassifierService {
       }
     }
     double edgeRatio = strongEdges / edgeCount.toDouble();
-
-    // Rejection check: Mammograms / Ultrasounds must be grayscale/monochrome
     if (monoRatio < 0.70 || contrastRange < 0.20 || edgeRatio > 0.35) {
       return {
         'success': false,
@@ -94,11 +84,7 @@ class BreastClassifierService {
       };
     }
 
-    // =========================================================================
-    // STEP 1: MAMOGRAPHIC & SONOGRAPHIC FEATURE EXTRACTION
-    // =========================================================================
     List<double> tissuePixels = [];
-
     for (int i = 0; i < totalPixels; i++) {
       if (grayValues[i] > 0.08) {
         tissuePixels.add(grayValues[i]);
@@ -110,8 +96,6 @@ class BreastClassifierService {
     }
 
     double meanTissue = tissuePixels.reduce((a, b) => a + b) / tissuePixels.length;
-
-    // 1. Microcalcifications (Small high-intensity punctate hyperdensities)
     List<double> sortedTissue = List.from(tissuePixels)..sort();
     double p92 = sortedTissue[(sortedTissue.length * 0.92).floor()];
     int microcalcCount = 0;
@@ -119,8 +103,6 @@ class BreastClassifierService {
       if (g >= p92 && g > 0.65) microcalcCount++;
     }
     double microcalcDensity = math.min(1.0, (microcalcCount / tissuePixels.length.toDouble()) * 28.0);
-
-    // 2. Focal Mass Segmentation
     int massCount = 0;
     List<bool> massMask = List.filled(totalPixels, false);
     for (int i = 0; i < totalPixels; i++) {
@@ -131,7 +113,6 @@ class BreastClassifierService {
       }
     }
     if (massCount < 20) {
-      // Check for hypoechoic lesion in ultrasound
       massCount = 0;
       for (int i = 0; i < totalPixels; i++) {
         double g = grayValues[i];
@@ -142,8 +123,6 @@ class BreastClassifierService {
       }
     }
     double massRatio = math.min(1.0, (massCount / tissuePixels.length.toDouble()) * 5.0);
-
-    // 3. Margin Spiculation (Stellate perimeter)
     int perimeter = 0;
     for (int y = 1; y < 127; y++) {
       for (int x = 1; x < 127; x++) {
@@ -157,8 +136,6 @@ class BreastClassifierService {
     }
     double compactness = (perimeter * perimeter) / (4.0 * math.pi * math.max(1.0, massCount.toDouble()));
     double spiculationIndex = math.min(1.0, math.max(0.0, (compactness - 1.0) / 4.5));
-
-    // 4. Architectural Distortion & Quadrant Asymmetry
     double topHalf = 0.0, botHalf = 0.0, lftHalf = 0.0, rgtHalf = 0.0;
     for (int y = 0; y < 128; y++) {
       for (int x = 0; x < 128; x++) {
@@ -170,14 +147,9 @@ class BreastClassifierService {
     double asymV = (topHalf - botHalf).abs() / math.max(1.0, topHalf + botHalf);
     double asymH = (lftHalf - rgtHalf).abs() / math.max(1.0, lftHalf + rgtHalf);
     double architecturalDistortion = math.min(1.0, (asymV + asymH) * 1.3);
-
-    // 5. Texture Heterogeneity
     double tissueStd = _stdDev(tissuePixels);
     double tissueHeterogeneity = math.min(1.0, tissueStd * 4.2);
 
-    // =========================================================================
-    // STEP 2: CANCER RISK PERCENTAGE & BI-RADS CLASSIFICATION
-    // =========================================================================
     double rawRisk = (0.30 * microcalcDensity +
             0.25 * spiculationIndex +
             0.20 * massRatio +
@@ -186,7 +158,6 @@ class BreastClassifierService {
         100.0;
 
     double cancerRisk = double.parse(math.min(98.5, math.max(3.5, rawRisk)).toStringAsFixed(1));
-
     String biradsCategory, riskLevel, summary, recommendations;
     String topDiag;
 
