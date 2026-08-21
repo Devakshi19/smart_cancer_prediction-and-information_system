@@ -33,7 +33,6 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
   bool _isListening = false;
 
   final List<FAQItem> _faqDatabase = [
-    // ORIGINAL 4
     FAQItem(
       title: "How to use the app?",
       icon: Icons.help_outline,
@@ -63,7 +62,6 @@ class _AIChatbotPageState extends State<AIChatbotPage> {
       "Breast cancer originates in breast tissue cells. Regular self-examinations and routine mammograms are critical for early detection and high treatment success rates.",
     ),
 
-    // NEW 15 APP RELATED QUESTIONS
     FAQItem(
       title: "How does AI Scan work?",
       icon: Icons.camera_alt,
