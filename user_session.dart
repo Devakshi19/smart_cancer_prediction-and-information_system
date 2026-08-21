@@ -1,7 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserSession {
-  // Save user details
   static Future<void> saveUser({
     required String name,
     required String email,
