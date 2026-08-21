@@ -233,7 +233,6 @@ class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
   ];
 
   Future<void> _makePhoneCall(String phoneNumber) async {
-    // Remove spaces, newlines, and text like "Contact Hospital"
     String cleanedNumber = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
 
     if (cleanedNumber.isEmpty) {
@@ -492,7 +491,7 @@ class _LungCancerDetailsPageState extends State<LungCancerDetailsPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () => _makePhoneCall(phone), // CHANGED: NOW CALLS
+                  onPressed: () => _makePhoneCall(phone), 
                   icon: const Icon(Icons.phone, size: 18),
                   label: Text(phone),
                   style: ElevatedButton.styleFrom(
