@@ -13,7 +13,6 @@ import 'scan_service.dart';
 
 class ScanPage extends StatefulWidget {
   final String? initialCategory;
-
   const ScanPage({Key? key, this.initialCategory}) : super(key: key);
 
   @override
@@ -22,8 +21,6 @@ class ScanPage extends StatefulWidget {
 
 class _ScanPageState extends State<ScanPage> {
   final ImagePicker _picker = ImagePicker();
-
-  // Mobile: use File; Web: use Uint8List bytes
   File? _imageFile;
   Uint8List? _imageBytes;
   XFile? _pickedXFile;
@@ -103,7 +100,6 @@ class _ScanPageState extends State<ScanPage> {
     String? downloadUrl;
 
     try {
-      // 1. Upload to Firebase Storage if available (non-blocking)
       final String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       final String categoryFolder = _selectedCategory.toLowerCase();
 
@@ -129,8 +125,6 @@ class _ScanPageState extends State<ScanPage> {
         debugPrint("Firebase Storage upload note: $e");
         downloadUrl = null;
       }
-
-      // 2. Run AI Detection via Python Backend (with seamless on-device fallback)
       Map<String, dynamic> aiResult;
 
       if (_selectedCategory == 'Uterine') {
@@ -210,7 +204,6 @@ class _ScanPageState extends State<ScanPage> {
           }
         }
       } else {
-        // Standard fallback for other organ scan types
         aiResult = {
           'riskLevel': 'Low Risk / Normal',
           'diagnosis': 'Normal $_selectedCategory Scan',
@@ -223,7 +216,6 @@ class _ScanPageState extends State<ScanPage> {
         };
       }
 
-      // Check if image was rejected by AI validation
       if (_selectedCategory == 'Uterine' && (aiResult['is_valid_uterine'] == false || aiResult['success'] == false)) {
         final String errorMsg = aiResult['error'] ??
             'Non-medical image detected. Please upload an authentic Pelvic Ultrasound (TVS) or H&E Histopathology scan.';
@@ -247,8 +239,6 @@ class _ScanPageState extends State<ScanPage> {
       }
 
       final String finalImageUrl = downloadUrl ?? (_imageFile?.path ?? 'scan_upload');
-
-      // 3. Save Scan Record
       await ScanService.saveScanRecord(
         cancerCategory: _selectedCategory,
         result: aiResult['riskLevel'] ?? aiResult['risk_level'] ?? 'Analyzed',
@@ -259,7 +249,6 @@ class _ScanPageState extends State<ScanPage> {
       );
 
       if (!mounted) return;
-
       _showSnackBar('Scan complete! $_selectedCategory Cancer Report generated.');
       _showResultsDialog(aiResult);
     } catch (e) {
@@ -456,8 +445,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Cancer Risk Percentage Section
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -524,8 +511,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                 ),
                 const SizedBox(height: 14),
-
-                // FIGO Stage (if Uterine Cancer)
                 if (figo != null && figo.isNotEmpty) ...[
                   const Text(
                     'FIGO Assessment / Clinical Staging:',
@@ -551,8 +536,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                   const SizedBox(height: 14),
                 ],
-
-                // BI-RADS Category (if Breast Cancer)
                 if (birads != null && birads.isNotEmpty) ...[
                   const Text(
                     'BI-RADS Assessment Category:',
@@ -578,8 +561,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                   const SizedBox(height: 14),
                 ],
-
-                // Primary Diagnosis
                 const Text(
                   'Primary Diagnostic Classification:',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey),
@@ -594,8 +575,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                 ),
                 const SizedBox(height: 14),
-
-                // Uterine Sonographic & Histopathology Features (if Uterine Cancer)
                 if (_selectedCategory == 'Uterine' && radFeatures != null && radFeatures.isNotEmpty) ...[
                   const Text(
                     'Pelvic Sonographic & Histopathology Features:',
@@ -624,8 +603,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                   const SizedBox(height: 14),
                 ],
-
-                // Breast Mammographic & Ultrasound Features (if Breast Cancer)
                 if (_selectedCategory == 'Breast' && radFeatures != null && radFeatures.isNotEmpty) ...[
                   const Text(
                     'Mammographic & Sonographic Features:',
@@ -654,8 +631,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                   const SizedBox(height: 14),
                 ],
-
-                // Lung Radiological Features (if Lung Cancer)
                 if (_selectedCategory == 'Lung' && radFeatures != null && radFeatures.isNotEmpty) ...[
                   const Text(
                     'Radiological & CT Feature Metrics:',
@@ -684,8 +659,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                   const SizedBox(height: 14),
                 ],
-
-                // ABCDE Dermatological Criteria Cards (if Skin Cancer)
                 if (_selectedCategory == 'Skin' && abcde != null && abcde.isNotEmpty) ...[
                   const Text(
                     'Dermatological ABCDE Criteria:',
@@ -714,8 +687,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                   const SizedBox(height: 14),
                 ],
-
-                // All Probabilities Breakdown
                 if (probabilities != null && probabilities.isNotEmpty) ...[
                   const Text(
                     'Diagnostic Probabilities Breakdown:',
@@ -742,8 +713,6 @@ class _ScanPageState extends State<ScanPage> {
                   )),
                   const SizedBox(height: 14),
                 ],
-
-                // Clinical Observations
                 if (summary.isNotEmpty) ...[
                   const Text(
                     'Key Clinical Findings & Observations:',
@@ -756,8 +725,6 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                   const SizedBox(height: 14),
                 ],
-
-                // Actionable Recommendations
                 if (recommendations.isNotEmpty) ...[
                   const Text(
                     'Recommended Next Steps:',
@@ -900,8 +867,6 @@ class _ScanPageState extends State<ScanPage> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Category Overview Card
             Card(
               elevation: 0,
               color: const Color(0xFFF8F5FF),
@@ -950,8 +915,6 @@ class _ScanPageState extends State<ScanPage> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Photo Selection Box
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -1058,8 +1021,6 @@ class _ScanPageState extends State<ScanPage> {
               ),
             ),
             const SizedBox(height: 30),
-
-            // Execution Action Button
             SizedBox(
               height: 52,
               child: ElevatedButton(
