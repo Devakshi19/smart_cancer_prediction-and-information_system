@@ -1,21 +1,18 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 class UterineClassifierService {
-  /// Analyze from File (mobile)
   static Future<Map<String, dynamic>> analyzeUterineImage(File imageFile) async {
     final rawBytes = await imageFile.readAsBytes();
     return _analyzeBytes(rawBytes);
   }
 
-  /// Analyze from raw bytes (web)
   static Future<Map<String, dynamic>> analyzeUterineImageBytes(Uint8List rawBytes) async {
     return _analyzeBytes(rawBytes);
   }
 
-  /// 100% Deterministic on-device clinical analysis for Pelvic Ultrasound & Histopathology.
   static Map<String, dynamic> _analyzeBytes(Uint8List rawBytes) {
     final img.Image? decoded = img.decodeImage(rawBytes);
     if (decoded == null) {
@@ -27,7 +24,6 @@ class UterineClassifierService {
       };
     }
 
-    // Step 0: Resize and Quantize to eliminate JPEG compression variance
     final img.Image thumb = img.copyResize(decoded, width: 128, height: 128);
     final int totalPixels = thumb.width * thumb.height;
 
@@ -56,8 +52,6 @@ class UterineClassifierService {
         if (chromaDiff < 0.12) {
           monoPixels++;
         }
-
-        // H&E Histopathology staining check (purple/pink/violet)
         if (r > 0.30 && b > 0.25 && g < (r + b) * 0.58) {
           heStainPixels++;
         }
@@ -66,8 +60,6 @@ class UterineClassifierService {
 
     double monoRatio = monoPixels / totalPixels.toDouble();
     double heRatio = heStainPixels / totalPixels.toDouble();
-
-    // Dynamic range
     List<double> sortedGray = List.from(grayValues)..sort();
     double p5 = sortedGray[(sortedGray.length * 0.05).floor()];
     double p95 = sortedGray[(sortedGray.length * 0.95).floor()];
@@ -87,10 +79,6 @@ class UterineClassifierService {
             'Please upload a valid medical scan (Pelvic/Transvaginal Sonography or H&E Histology).',
       };
     }
-
-    // =========================================================================
-    // STEP 1: CLINICAL & SONOGRAPHIC FEATURE EXTRACTION
-    // =========================================================================
     List<double> tissuePixels = [];
 
     for (int i = 0; i < totalPixels; i++) {
@@ -104,8 +92,6 @@ class UterineClassifierService {
     }
 
     double meanTissue = tissuePixels.reduce((a, b) => a + b) / tissuePixels.length;
-
-    // 1. Endometrial Stripe Thickness (ET hyperechoic central stripe or dense cellular zone)
     List<double> sortedTissue = List.from(tissuePixels)..sort();
     double p88 = sortedTissue[(sortedTissue.length * 0.88).floor()];
     int etCount = 0;
@@ -113,8 +99,6 @@ class UterineClassifierService {
       if (g >= p88) etCount++;
     }
     double etRatio = math.min(1.0, (etCount / tissuePixels.length.toDouble()) * 14.0);
-
-    // 2. Endomyometrial Junction Disruption & Deep Infiltration
     int massCount = 0;
     List<bool> etMask = List.filled(totalPixels, false);
     for (int i = 0; i < totalPixels; i++) {
@@ -137,8 +121,6 @@ class UterineClassifierService {
     }
     double compactness = (perimeter * perimeter) / (4.0 * math.pi * math.max(1.0, massCount.toDouble()));
     double junctionalDisruption = math.min(1.0, math.max(0.0, (compactness - 1.0) / 5.0));
-
-    // 3. Nuclear Pleomorphism & Glandular Crowding
     int nucleiCount = 0;
     for (int i = 0; i < totalPixels; i++) {
       double g = grayValues[i];
@@ -147,21 +129,13 @@ class UterineClassifierService {
       }
     }
     double glandularCrowding = math.min(1.0, (nucleiCount / tissuePixels.length.toDouble()) * 3.8);
-
-    // 4. Myometrial Mass Heterogeneity
     double tissueStd = _stdDev(tissuePixels);
     double massHeterogeneity = math.min(1.0, tissueStd * 4.5);
-
-    // 5. Pelvic Fluid Accumulation & Cavitary Distortion
     int fluidCount = 0;
     for (double g in grayValues) {
       if (g < 0.06 && g > 0.01) fluidCount++;
     }
     double fluidRatio = math.min(1.0, (fluidCount / totalPixels.toDouble()) * 8.0);
-
-    // =========================================================================
-    // STEP 2: CANCER RISK PERCENTAGE & FIGO STAGING
-    // =========================================================================
     double rawRisk = (0.30 * etRatio +
             0.25 * junctionalDisruption +
             0.20 * glandularCrowding +
