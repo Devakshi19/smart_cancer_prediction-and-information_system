@@ -4,18 +4,15 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 class LungClassifierService {
-  /// Analyze from File (mobile)
   static Future<Map<String, dynamic>> analyzeLungImage(File imageFile) async {
     final rawBytes = await imageFile.readAsBytes();
     return _analyzeBytes(rawBytes);
   }
 
-  /// Analyze from raw bytes (web)
   static Future<Map<String, dynamic>> analyzeLungImageBytes(Uint8List rawBytes) async {
     return _analyzeBytes(rawBytes);
   }
 
-  /// 100% Deterministic on-device radiologic analysis for Chest X-Rays and CT Scans.
   static Map<String, dynamic> _analyzeBytes(Uint8List rawBytes) {
     final img.Image? decoded = img.decodeImage(rawBytes);
     if (decoded == null) {
@@ -27,7 +24,6 @@ class LungClassifierService {
       };
     }
 
-    // Step 0: Resize and Quantize to eliminate JPEG compression variance
     final img.Image thumb = img.copyResize(decoded, width: 128, height: 128);
     final int totalPixels = thumb.width * thumb.height;
 
@@ -37,7 +33,6 @@ class LungClassifierService {
     List<double> grayValues = [];
 
     int monoPixels = 0;
-
     for (int y = 0; y < thumb.height; y++) {
       for (int x = 0; x < thumb.width; x++) {
         final pixel = thumb.getPixel(x, y);
@@ -59,14 +54,11 @@ class LungClassifierService {
     }
 
     double monoRatio = monoPixels / totalPixels.toDouble();
-
-    // Dynamic range
     List<double> sortedGray = List.from(grayValues)..sort();
     double p5 = sortedGray[(sortedGray.length * 0.05).floor()];
     double p95 = sortedGray[(sortedGray.length * 0.95).floor()];
     double contrastRange = p95 - p5;
 
-    // Edge density
     int strongEdges = 0;
     int edgeCount = 0;
     for (int y = 0; y < 127; y++) {
@@ -80,8 +72,6 @@ class LungClassifierService {
       }
     }
     double edgeDensity = edgeCount > 0 ? strongEdges / edgeCount.toDouble() : 0.0;
-
-    // Validate radiological scan
     bool isValid = (monoRatio >= 0.70) &&
         (contrastRange >= 0.25) &&
         (edgeDensity >= 0.02) &&
@@ -100,7 +90,6 @@ class LungClassifierService {
       };
     }
 
-    // Step 2: Feature Extraction
     double p20 = sortedGray[(sortedGray.length * 0.20).floor()];
     double p80 = sortedGray[(sortedGray.length * 0.80).floor()];
     double medianVal = sortedGray[(sortedGray.length * 0.50).floor()];
@@ -140,8 +129,6 @@ class LungClassifierService {
     }
 
     double massRatio = _round4(math.min(1.0, (noduleCount / lungPixels.toDouble()) * 2.8));
-
-    // Spiculation / Border irregularity
     int perimeterPixels = 0;
     for (int i = 0; i < totalPixels; i++) {
       if (!noduleMask[i]) continue;
@@ -161,8 +148,6 @@ class LungClassifierService {
     double compactness = (perimeterPixels.toDouble() * perimeterPixels.toDouble()) /
         (4.0 * math.pi * math.max(1.0, noduleCount.toDouble()));
     double spiculationIndex = _round4(math.min(1.0, math.max(0.0, (compactness - 1.0) / 3.8)));
-
-    // Bilateral Hemithorax Asymmetry
     double leftSum = 0, rightSum = 0;
     int leftCount = 0, rightCount = 0;
     for (int y = 0; y < 128; y++) {
@@ -178,8 +163,6 @@ class LungClassifierService {
     double leftAvg = leftCount > 0 ? leftSum / leftCount : 0;
     double rightAvg = rightCount > 0 ? rightSum / rightCount : 0;
     double asymmetry = _round4(math.min(1.0, (leftAvg - rightAvg).abs() * 3.2));
-
-    // Calculate Malignancy Risk
     double malignancy = _round4(
         0.30 * noduleAttenuation +
         0.25 * spiculationIndex +
@@ -273,7 +256,6 @@ class LungClassifierService {
   }
 
   static double _round4(double v) => double.parse(v.toStringAsFixed(4));
-
   static double _stdDev(List<double> values) {
     if (values.length < 2) return 0.0;
     double mean = values.reduce((a, b) => a + b) / values.length;
