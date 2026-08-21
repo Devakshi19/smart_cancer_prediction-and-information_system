@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../screens/scan_pages.dart'; // ADD THIS
-
+import '../screens/scan_pages.dart'; 
 
 class SkinCancerCard extends StatelessWidget {
   const SkinCancerCard({super.key});
@@ -241,7 +240,6 @@ class _SkinCancerDetailsPageState extends State<SkinCancerDetailsPage> {
     },
   ];
   Future<void> _makePhoneCall(String phoneNumber) async {
-    // Remove spaces, newlines, and text like "Contact Hospital"
     String cleanedNumber = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
 
     if (cleanedNumber.isEmpty) {
