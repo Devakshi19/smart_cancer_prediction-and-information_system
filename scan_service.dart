@@ -7,11 +7,7 @@ import 'historypage.dart';
 
 class ScanService {
   static const String _localScansKey = 'user_scan_history_records';
-  
-  /// Global notifier to notify UI widgets (like AI Screening Dashboard) when scans change
   static final ValueNotifier<int> scanUpdatesNotifier = ValueNotifier<int>(0);
-
-  /// Save a new scan record to user's Cloud Firestore account & local cache
   static Future<void> saveScanRecord({
     required String cancerCategory,
     required String result,
@@ -40,7 +36,6 @@ class ScanService {
       'timestamp': now.millisecondsSinceEpoch,
     };
 
-    // 1. Save to Cloud Firestore under User's UID if logged in
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
@@ -60,7 +55,6 @@ class ScanService {
       }
     }
 
-    // 2. Save to Local SharedPreferences Cache for persistent access
     try {
       final prefs = await SharedPreferences.getInstance();
       List<String> stored = prefs.getStringList(_localScansKey) ?? [];
@@ -71,19 +65,14 @@ class ScanService {
       debugPrint("Local scan save error: $e");
     }
 
-    // Notify listeners that a new scan was recorded
     scanUpdatesNotifier.value++;
   }
 
-  /// Compute dynamic real-time stats for the Home AI Screening Dashboard
   static Future<Map<String, String>> getDashboardStats() async {
     final scans = await getUserScans();
 
-    // 1. Total Scans (formatted with leading zero if single digit)
     final int totalCount = scans.length;
     final String totalStr = totalCount < 10 ? '0$totalCount' : '$totalCount';
-
-    // 2. Active Scans (scans recorded today)
     final now = DateTime.now();
     int scansToday = 0;
     for (var scan in scans) {
@@ -100,8 +89,6 @@ class ScanService {
       }
     }
     final String activeStr = scansToday < 10 ? '0$scansToday' : '$scansToday';
-
-    // 3. Last Scan Date
     String lastScanStr = '--';
     if (scans.isNotEmpty) {
       final latest = scans.first;
@@ -140,13 +127,9 @@ class ScanService {
       'last': lastScanStr,
     };
   }
-
-  /// Fetch all scan records for current user (combining Firestore + Local + Defaults)
   static Future<List<ScanRecord>> getUserScans() async {
     List<ScanRecord> scans = [];
     final user = FirebaseAuth.instance.currentUser;
-
-    // 1. Fetch from Firestore if logged in
     if (user != null) {
       try {
         final querySnapshot = await FirebaseFirestore.instance
@@ -164,7 +147,6 @@ class ScanService {
       }
     }
 
-    // 2. Fetch from Local Cache if Firestore is empty or offline
     try {
       final prefs = await SharedPreferences.getInstance();
       List<String> stored = prefs.getStringList(_localScansKey) ?? [];
@@ -181,19 +163,14 @@ class ScanService {
     } catch (e) {
       debugPrint("Local fetch error: $e");
     }
-
-    // 3. Fallback mock initial records if no scans recorded yet
     if (scans.isEmpty) {
       scans.addAll(_defaultScans);
     }
-
-    // Sort by newest timestamp first
     scans.sort((a, b) => (b.timestamp ?? 0).compareTo(a.timestamp ?? 0));
 
     return scans;
   }
 
-  /// Delete a scan record from Firestore and Local Cache
   static Future<void> deleteScanRecord(String scanId) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -247,7 +224,6 @@ class ScanService {
   }
 
   static String _twoDigits(int n) => n >= 10 ? "$n" : "0$n";
-
   static final List<ScanRecord> _defaultScans = [
     const ScanRecord(
       id: "demo_1",
